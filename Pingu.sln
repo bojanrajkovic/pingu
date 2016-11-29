@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AA2EDA1C-792
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pingu.Tests", "src\Pingu.Tests\Pingu.Tests.csproj", "{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pingu.Benchmarks", "src\Pingu.Benchmarks\Pingu.Benchmarks.csproj", "{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,5 +36,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0B160E02-1A00-4A8C-99DE-3404F046E03C} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
+		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
 	EndGlobalSection
 EndGlobal

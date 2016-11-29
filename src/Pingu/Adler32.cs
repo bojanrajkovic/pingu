@@ -18,9 +18,13 @@ namespace Pingu
             var read = 0;
 
             while ((read = await data.ReadAsync(buffer, 0, buffer.Length)) > 0) {
-                for (var i = 0; i < read; i++) {
-                    a = (a + buffer[i]) % Adler32Modulus;
-                    b = (b + a) % Adler32Modulus;
+                unsafe {
+                    fixed (byte* bufPtr = buffer) {
+                        for (var i = 0; i < read; i++) {
+                            a = (a + *(bufPtr + i)) % Adler32Modulus;
+                            b = (b + a) % Adler32Modulus;
+                        }
+                    }
                 }
             }
 
