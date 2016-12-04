@@ -19,7 +19,7 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public async Task<uint> ComputeAdler32Pointer()
         {
-            return await Adler32.CalculateAdler32Async(data);
+            return await Adler32.ComputeAsync(data);
         }
 
         [Benchmark]

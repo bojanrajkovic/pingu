@@ -25,8 +25,10 @@ namespace Pingu.Tests
         [MemberData(nameof (Crc32TestVectors))]
         public async Task Test_CRC32_Computation_Async(byte[] input, uint expected)
         {
-            var actual = await Crc32.ComputeAsync(input);
-            Assert.Equal(expected, actual);
+            unchecked {
+                var actual = await Crc32.ComputeAsync(input);
+                Assert.Equal((int) expected, actual);
+            }
         }
     }
 }
