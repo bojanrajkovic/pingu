@@ -8,10 +8,10 @@ namespace Pingu
     {
         const int Adler32Modulus = 65521;
 
-        public static Task<uint> CalculateAdler32Async(byte[] data) =>
-            CalculateAdler32Async(new MemoryStream(data));
+        public static Task<int> ComputeAsync(byte[] data) =>
+            ComputeAsync(new MemoryStream(data));
 
-        public static async Task<uint> CalculateAdler32Async(Stream data)
+        public static async Task<int> ComputeAsync(Stream data)
         {
             uint a = 1, b = 0;
             var buffer = new byte[4 * 1024];
@@ -28,7 +28,9 @@ namespace Pingu
                 }
             }
 
-            return (b << 16) | a;
+            unchecked {
+                return (int)((b << 16) | a);
+            }
         }
     }
 }
