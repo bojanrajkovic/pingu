@@ -9,6 +9,9 @@
     <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Zooey.RGBA32" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.App">
       <Version>1.0.1</Version>
     </PackageReference>
@@ -29,5 +32,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Pingu\Pingu.csproj" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
