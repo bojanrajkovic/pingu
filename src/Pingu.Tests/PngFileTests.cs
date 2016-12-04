@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,6 +34,13 @@ namespace Pingu.Tests
             var path = Path.Combine(Path.GetDirectoryName(asm.Location), "Zooey.png");
             using (var fs = new FileStream(path, FileMode.Create))
                 await pngFile.WriteFileAsync(fs);
+
+            Assert.True(File.Exists(path));
+
+            var result = ToolHelper.RunPngCheck(path);
+
+            Assert.Equal(0, result.ExitCode);
+            System.Console.Write(result.StandardOutput);
         }
     }
 }
