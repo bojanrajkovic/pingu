@@ -9,7 +9,7 @@ namespace Pingu
 {
     public abstract class Chunk
     {
-        public async Task WriteSelfToStreamAsync(Stream stream)
+        internal async Task WriteSelfToStreamAsync(Stream stream)
         {
             var chunkType = Encoding.ASCII.GetBytes(Name);
             var data = await GetChunkDataAsync();
