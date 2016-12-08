@@ -11,23 +11,21 @@ namespace Pingu.Filters
 
         internal UpFilter() { }
 
-        public unsafe byte[] Filter(byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
+        public unsafe void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
         {
             // The Up filter reads the previous scanline, so if it's null, this must be the first
             // scanline and it's unfiltered.
-            if (previousScanline == null)
-                return rawScanline;
-
-            byte[] filteredScanline = new byte[rawScanline.Length];
+            if (previousScanline == null) {
+                Buffer.BlockCopy(rawScanline, 0, targetBuffer, targetOffset, rawScanline.Length);
+                return;
+            }
 
             fixed (byte* raw = rawScanline)
             fixed (byte* previous = previousScanline)
-            fixed (byte* filtered = filteredScanline) {
+            fixed (byte* target = targetBuffer) {
                 for (var i = 0; i < rawScanline.Length; i++)
-                    filtered[i] = (byte)((raw[i] - previous[i]) % 256);
+                    target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
             }
-
-            return filteredScanline;
         }
 
         public unsafe byte[] ReverseFilter(byte[] filteredScanline, byte[] previousScanline, int bytesPerPixel)
