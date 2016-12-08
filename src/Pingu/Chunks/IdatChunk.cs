@@ -59,20 +59,15 @@ namespace Pingu.Chunks
             var adler = new Adler32();
 
             // Apply filtering. Both byte[]s always represent the unfiltered scanline.
-            byte[] previousScanline = null;
-            byte[] scanline = new byte[imageInfo.Width * pixelWidth];
+            byte[] previousScanline = null, scanline = new byte[imageInfo.Width * pixelWidth];
             for (int i = 0; i < imageInfo.Height; i++) {
                 Buffer.BlockCopy(rawRgbData, i * scanline.Length, scanline, 0, scanline.Length);
 
-                // TODO: Replace IFilter API with FilterInto to avoid extra array allocation
                 var scanlineToWrite = new byte[1 + scanline.Length];
                 scanlineToWrite[0] = (byte) FilterType;
 
-                var filteredScanline = Filter(scanline, previousScanline, pixelWidth);
-                Buffer.BlockCopy(filteredScanline, 0, scanlineToWrite, 1, filteredScanline.Length);
-
+                FilterInto(scanlineToWrite, 1, scanline, previousScanline, pixelWidth);
                 adler.FeedBlock(scanlineToWrite);
-                
                 await deflateStream.WriteAsync(scanlineToWrite, 0, scanlineToWrite.Length);
 
                 previousScanline = previousScanline ?? new byte[scanline.Length];
@@ -90,11 +85,14 @@ namespace Pingu.Chunks
             return compressedData;
         }
 
-        private byte[] Filter(byte[] scanline, byte[] previousScanline, int pixelWidth)
-        {
-            return DefaultFilters.GetFilterForType(FilterType)
-                                 .Filter(scanline, previousScanline, pixelWidth);
-        }
+        void FilterInto(
+            byte[] scanlineToWrite,
+            int targetOffset,
+            byte[] rawScanline,
+            byte[] previousScanline,
+            int pixelWidth)
+            => DefaultFilters.GetFilterForType(FilterType)
+                             .FilterInto(scanlineToWrite, targetOffset, rawScanline, previousScanline, pixelWidth);
 
         int GetPixelWidthForImage()
         {

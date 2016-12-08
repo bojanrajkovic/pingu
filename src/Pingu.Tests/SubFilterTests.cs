@@ -20,7 +20,7 @@ namespace Pingu.Tests
 
                 yield return new object[] {
                     new byte [] { 0x12, 0x21, 0x28, 0x35 },
-                    new byte [] { 0x12, 0x21, (byte)(0x28-0x12), (byte)(0x35-0x21) },
+                    new byte [] { 0x12, 0x21, 0x28 - 0x12, 0x35-0x21 },
                     2
                 };
             }
@@ -31,7 +31,8 @@ namespace Pingu.Tests
         public void Can_filter_correctly(byte[] input, byte[] expected, int bytesPerPixel)
         {
             var filter = SubFilter.Instance;
-            var filteredScanline = filter.Filter(input, null, bytesPerPixel);
+            var filteredScanline = new byte[expected.Length];
+            filter.FilterInto(filteredScanline, 0, input, null, bytesPerPixel);
 
             Assert.Equal(expected, filteredScanline);
         }

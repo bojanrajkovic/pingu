@@ -2,7 +2,7 @@
 {
     interface IFilter
     {
-        byte[] Filter(byte[] scanline, byte[] previousScanline, int bytesPerPixel);
+        void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel);
         byte[] ReverseFilter(byte[] scanline, byte[] previousScanline, int bytesPerPixel);
     }
 }
