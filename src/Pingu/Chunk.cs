@@ -19,7 +19,7 @@ namespace Pingu
             var chunkTypeAndData = new byte[chunkType.Length + data.Length];
             Buffer.BlockCopy(chunkType, 0, chunkTypeAndData, 0, chunkType.Length);
             Buffer.BlockCopy(data, 0, chunkTypeAndData, chunkType.Length, data.Length);
-            var crc32 = await CalculateCRC32Async(chunkTypeAndData);
+            var crc32 = CalculateCRC32(chunkTypeAndData);
 
             await stream.WriteAsync(length, 0, length.Length);
             await stream.WriteAsync(chunkType, 0, chunkType.Length);
@@ -27,8 +27,7 @@ namespace Pingu
             await stream.WriteAsync(crc32, 0, crc32.Length);
         }
 
-        async Task<byte[]> CalculateCRC32Async(byte[] data) 
-            => GetBytesForInteger(await Crc32.ComputeAsync(data));
+        byte[] CalculateCRC32(byte[] data) => GetBytesForInteger(Crc32.Compute(data));
 
         public abstract string Name { get; }
         public abstract int Length { get; }

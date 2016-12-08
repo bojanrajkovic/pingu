@@ -64,8 +64,7 @@ namespace Pingu
                 await scanlineStream.CopyToAsync(ds);
 
             // Write the ADLER32 Zlib checksum
-            scanlineStream.Seek(0, SeekOrigin.Begin);
-            var adler = await Adler32.ComputeAsync(scanlineStream);
+            var adler = Adler32.Compute(scanlineStream.ToArray());
             var adlerBytes = GetBytesForInteger(adler);
             compressedStream.Write(adlerBytes, 0, adlerBytes.Length);
 

@@ -9,7 +9,7 @@ namespace Pingu.Tests
 {
     public class Crc32Tests
     {
-        public static IEnumerable<object[]> Crc32TestVectors ()
+        public static IEnumerable<object[]> Crc32TestVectors()
         {
             byte[] ascii(string input) => Encoding.ASCII.GetBytes(input);
             byte[] hex(string input) => Enumerable.Range(0, input.Length)
@@ -22,12 +22,12 @@ namespace Pingu.Tests
         }
 
         [Theory]
-        [MemberData(nameof (Crc32TestVectors))]
-        public async Task Test_CRC32_Computation_Async(byte[] input, uint expected)
+        [MemberData(nameof(Crc32TestVectors))]
+        public void Test_CRC32_Computation(byte[] input, uint expected)
         {
             unchecked {
-                var actual = await Crc32.ComputeAsync(input);
-                Assert.Equal((int) expected, actual);
+                var actual = Crc32.Compute(input);
+                Assert.Equal((int)expected, actual);
             }
         }
     }
