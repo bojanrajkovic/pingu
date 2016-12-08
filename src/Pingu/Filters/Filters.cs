@@ -12,7 +12,7 @@ namespace Pingu.Filters
                 case FilterType.Sub:
                     return SubFilter.Instance;
                 case FilterType.Up:
-                    throw new NotImplementedException();
+                    return UpFilter.Instance;
                 case FilterType.Average:
                     throw new NotImplementedException();
                 case FilterType.Paeth:
