@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Pingu
+namespace Pingu.Chunks
 {
 
     public class IendChunk : Chunk
