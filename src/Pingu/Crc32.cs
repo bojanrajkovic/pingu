@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pingu
 {
-    public static class Crc32
+    static class Crc32
     {
         static readonly uint[] DefaultTable = {
             0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -43,25 +43,25 @@ namespace Pingu
             0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
         };
 
-        public static Task<int> ComputeAsync(byte[] data) =>
-            ComputeAsync(new MemoryStream(data));
-
-        public static async Task<int> ComputeAsync(Stream data)
+        public static int Compute(byte[] data)
         {
             var crc = 0xffffffffu;
-            var buffer = new byte[4 * 1024];
-            var read = 0;
-
-            while ((read = await data.ReadAsync(buffer, 0, buffer.Length)) > 0) {
-                unsafe {
-                    fixed (byte* bufPtr = buffer)
-                        for (var i = 0; i < read; i++)
-                            crc = (crc >> 8) ^ (DefaultTable[*(bufPtr + i) ^ (crc & 0xff)]);
-                }
+            unsafe {
+                fixed (byte* ptr = data)
+                    for (var i = 0; i < data.Length; i++)
+                        crc = (crc >> 8) ^ (DefaultTable[ptr[i] ^ (crc & 0xff)]);
             }
 
             unchecked {
                 return (int)~crc;
+            }
+        }
+
+        public static async Task<int> ComputeAsync(Stream data)
+        {
+            using (var ms = new MemoryStream()) {
+                await data.CopyToAsync(ms);
+                return Compute(ms.ToArray());
             }
         }
     }

@@ -31,10 +31,10 @@ namespace Pingu.Tests
 
         [Theory]
         [MemberData (nameof (Adler32TestVectors))]
-        public async Task Test_Adler32_Computation_Async(byte[] input, uint expected)
+        public void Test_Adler32_computation(byte[] input, uint expected)
         {
             unchecked {
-                var actual = await Adler32.ComputeAsync(input);
+                var actual = Adler32.Compute(input);
                 Assert.Equal((int)expected, actual);
             }
         }
