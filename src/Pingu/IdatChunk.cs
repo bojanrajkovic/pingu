@@ -3,6 +3,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 
+using Pingu.Filters;
+
 namespace Pingu
 {
 
@@ -14,11 +16,24 @@ namespace Pingu
 
         public override string Name => "IDAT";
         public override int Length => compressedLength;
+        public FilterType FilterType { get; }
 
-        public IdatChunk(IhdrChunk imageInfo, byte[] rawRgbData)
+        public IdatChunk(IhdrChunk imageInfo, byte[] rawRgbData, FilterType filterType)
         {
-            this.rawRgbData = rawRgbData;
-            this.imageInfo = imageInfo;
+            this.rawRgbData = rawRgbData ?? throw new ArgumentNullException(nameof(rawRgbData));
+            this.imageInfo = imageInfo ?? throw new ArgumentNullException(nameof(imageInfo));
+
+            // TODO: Maybe throw our own exception type here?
+            if (!Enum.IsDefined(typeof(FilterType), (byte)filterType))
+                throw new ArgumentOutOfRangeException(
+                    nameof(filterType),
+                    $"Filter type {filterType} is not defined."
+                );
+
+            if (filterType == FilterType.Dynamic)
+                throw new NotSupportedException("Dynamic filter range is not supported yet.");
+
+            FilterType = filterType;
         }
 
         protected override async Task<byte[]> GetChunkDataAsync() => await GetCompressedDataAsync();
@@ -28,17 +43,7 @@ namespace Pingu
             if (compressedData != null)
                 return compressedData;
 
-            int pixelWidth;
-            switch (imageInfo.ColorType) {
-                case 2:
-                    pixelWidth = 3;
-                    break;
-                case 6:
-                    pixelWidth = 4;
-                    break;
-                default:
-                    throw new Exception($"Don't know how to deal with color type {imageInfo.ColorType}.");
-            }
+            int pixelWidth = GetPixelWidthForImage();
 
             // Set up a couple of memory streams where we're going to hold our data.
             // We need one wrapper stream over the raw data, a stream for the final data,
@@ -47,20 +52,24 @@ namespace Pingu
                          compressedStream = new MemoryStream(),
                          scanlineStream = new MemoryStream();
 
-            // Write the zlib stream header. :-).
-            compressedStream.Write(new byte[] { 0x78, 0x9C }, 0, 2);
+            // Write the zlib stream header. :-). 0x78 indicates DEFLATE compression (8) with
+            // a sliding window of 2^7 (32 kB). 0xDA includes a check bit for the header and
+            // an indication that we're using the optimal compression algorithm.
+            compressedStream.Write(new byte[] { 0x78, 0xDA }, 0, 2);
 
-            // Pre-process the raw RGB data to add the filter stream.
-            var scanline = new byte[imageInfo.Width * pixelWidth];
+            // Apply filtering. Both byte[]s always represent the unfiltered scanline.
+            byte[] scanline = new byte[imageInfo.Width * pixelWidth],
+                   previousScanline = null;
             for (int i = 0; i < imageInfo.Height; i++) {
                 await readerStream.ReadAsync(scanline, 0, scanline.Length);
-                scanlineStream.WriteByte(0);
-                await scanlineStream.WriteAsync(scanline, 0, scanline.Length);
+                scanlineStream.WriteByte((byte) FilterType);
+                await scanlineStream.WriteAsync(Filter(scanline, previousScanline, pixelWidth), 0, scanline.Length);
+                previousScanline = scanline;
             }
 
             // Deflate the data and write it to the final compressed stream.
             scanlineStream.Seek(0, SeekOrigin.Begin);
-            using (var ds = new DeflateStream(compressedStream, CompressionMode.Compress, true))
+            using (var ds = new DeflateStream(compressedStream, CompressionLevel.Optimal, true))
                 await scanlineStream.CopyToAsync(ds);
 
             // Write the ADLER32 Zlib checksum
@@ -73,6 +82,24 @@ namespace Pingu
             compressedLength = compressedData.Length;
 
             return compressedData;
+        }
+
+        private byte[] Filter(byte[] scanline, byte[] previousScanline, int pixelWidth)
+        {
+            return DefaultFilters.GetFilterForType(FilterType)
+                                 .Filter(scanline, previousScanline, pixelWidth);
+        }
+
+        int GetPixelWidthForImage()
+        {
+            switch (imageInfo.ColorType) {
+                case 2:
+                    return 3;
+                case 6:
+                    return 4;
+                default:
+                    throw new Exception($"Don't know how to deal with color type {imageInfo.ColorType}.");
+            }
         }
     }
 }

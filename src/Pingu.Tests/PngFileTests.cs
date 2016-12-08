@@ -1,7 +1,10 @@
 ﻿using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using Xunit;
+
+using Pingu.Filters;
 
 namespace Pingu.Tests
 {
@@ -22,7 +25,7 @@ namespace Pingu.Tests
             }
 
             var header = new IhdrChunk(752, 1334, 8);
-            var idat = new IdatChunk(header, rawRgbaData);
+            var idat = new IdatChunk(header, rawRgbaData, FilterType.Sub);
             var end = new IendChunk();
 
             var pngFile = new PngFile() {
