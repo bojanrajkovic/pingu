@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 
+using Pingu.Checksums;
 using Pingu.Filters;
 
 namespace Pingu

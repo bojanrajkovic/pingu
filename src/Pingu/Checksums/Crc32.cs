@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pingu
+namespace Pingu.Checksums
 {
     static class Crc32
     {
