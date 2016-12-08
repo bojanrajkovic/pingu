@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Pingu
+namespace Pingu.Checksums
 {
     static class Adler32
     {

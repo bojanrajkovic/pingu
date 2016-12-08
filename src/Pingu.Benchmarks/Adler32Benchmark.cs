@@ -1,5 +1,8 @@
 ﻿using System;
+
 using BenchmarkDotNet.Attributes;
+
+using Pingu.Checksums;
 
 namespace Pingu.Benchmarks
 {

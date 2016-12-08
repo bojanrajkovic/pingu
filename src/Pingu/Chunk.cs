@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
+using Pingu.Checksums;
+
 namespace Pingu
 {
     public abstract class Chunk
