@@ -21,7 +21,6 @@ namespace Pingu
 
         public async Task WriteFileAsync(Stream target)
         {
-            Console.WriteLine($"Writing {chunksToWrite.Count} chunks...");
             await target.WriteAsync(magic, 0, magic.Length);
             foreach (var chunk in chunksToWrite)
                 await chunk.WriteSelfToStreamAsync(target);

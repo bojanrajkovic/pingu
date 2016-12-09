@@ -53,7 +53,8 @@ namespace Pingu.Chunks
 
             // Write the zlib stream header. :-). 0x78 indicates DEFLATE compression (8) with
             // a sliding window of 2^7 (32 kB). 0xDA includes a check bit for the header and
-            // an indication that we're using the optimal compression algorithm.
+            // an indication that we're using the optimal compression algorithm and default
+            // Huffman tree.
             compressedStream.Write(new byte[] { 0x78, 0xDA }, 0, 2);
 
             var adler = new Adler32();
@@ -74,6 +75,8 @@ namespace Pingu.Chunks
                 Buffer.BlockCopy(scanline, 0, previousScanline, 0, scanline.Length);
             }
 
+            deflateStream.Dispose();
+
             // Write the ADLER32 Zlib checksum
             var adlerBytes = GetBytesForInteger(adler.Hash);
             compressedStream.Write(adlerBytes, 0, adlerBytes.Length);
@@ -81,6 +84,8 @@ namespace Pingu.Chunks
             // Store the compressed data and length.
             compressedData = compressedStream.ToArray();
             compressedLength = compressedData.Length;
+
+            compressedStream.Dispose();
 
             return compressedData;
         }

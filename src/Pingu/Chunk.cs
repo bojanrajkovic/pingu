@@ -11,7 +11,7 @@ namespace Pingu
     {
         internal async Task WriteSelfToStreamAsync(Stream stream)
         {
-            var chunkType = Encoding.ASCII.GetBytes(Name);
+            var chunkType = new byte[] { (byte)Name[0], (byte)Name[1], (byte)Name[2], (byte)Name[3] };
             var data = await GetChunkDataAsync();
             var length = GetBytesForInteger(Length);
 
