@@ -59,7 +59,9 @@ namespace Pingu.Chunks
 
             var adler = new Adler32();
 
-            // Apply filtering. Both byte[]s always represent the unfiltered scanline.
+            // Apply filtering. Both byte[]s always represent the unfiltered scanline. Allocations
+            // and copies are the devil, so we do as few as possible here: roughly 2*Height copies,
+            // and 2 + Height allocations. Gotta. Go. Fast.
             byte[] previousScanline = null, scanline = new byte[imageInfo.Width * pixelWidth];
             for (int i = 0; i < imageInfo.Height; i++) {
                 Buffer.BlockCopy(rawRgbData, i * scanline.Length, scanline, 0, scanline.Length);
