@@ -61,12 +61,12 @@ namespace Pingu.Chunks
 
             // Apply filtering. Both byte[]s always represent the unfiltered scanline. Allocations
             // and copies are the devil, so we do as few as possible here: roughly 2*Height copies,
-            // and 2 + Height allocations. Gotta. Go. Fast.
-            byte[] previousScanline = null, scanline = new byte[imageInfo.Width * pixelWidth];
+            // and 3 allocations. Gotta. Go. Fast.
+            byte[] previousScanline = null, scanline = new byte[imageInfo.Width * pixelWidth],
+                   scanlineToWrite = new byte[1 + imageInfo.Width * pixelWidth];
             for (int i = 0; i < imageInfo.Height; i++) {
                 Buffer.BlockCopy(rawRgbData, i * scanline.Length, scanline, 0, scanline.Length);
 
-                var scanlineToWrite = new byte[1 + scanline.Length];
                 scanlineToWrite[0] = (byte) FilterType;
 
                 FilterInto(scanlineToWrite, 1, scanline, previousScanline, pixelWidth);
