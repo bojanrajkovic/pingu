@@ -30,23 +30,5 @@ namespace Pingu.Filters
                 }
             }
         }
-
-        public unsafe byte[] ReverseFilter(byte[] filteredScanline, byte[] previousScanline, int bytesPerPixel)
-        {
-            byte[] rawScanline = new byte[filteredScanline.Length];
-
-            fixed (byte* rawPtr = rawScanline)
-            fixed (byte* scanlinePtr = filteredScanline) {
-                Buffer.MemoryCopy(scanlinePtr, rawPtr, filteredScanline.Length, bytesPerPixel);
-
-                unchecked {
-                    // As in the filter, the first pixel's unchanged, so start at the 2nd.
-                    for (var x = bytesPerPixel; x < rawScanline.Length; x++)
-                        rawPtr[x] = (byte)((scanlinePtr[x] + scanlinePtr[x - bytesPerPixel]) % 256);
-                }
-            }
-
-            return rawScanline;
-        }
     }
 }

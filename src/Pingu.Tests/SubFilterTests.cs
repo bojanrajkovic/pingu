@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography;
 
 using Xunit;
 
@@ -35,16 +34,6 @@ namespace Pingu.Tests
             filter.FilterInto(filteredScanline, 0, input, null, bytesPerPixel);
 
             Assert.Equal(expected, filteredScanline);
-        }
-
-        [Theory]
-        [MemberData(nameof(SubFilterTestVectors))]
-        public void Can_unfilter_correctly(byte[] expected, byte[] filtered, int bytesPerPixel)
-        {
-            var filter = SubFilter.Instance;
-            var rawScanline = filter.ReverseFilter(filtered, null, bytesPerPixel);
-
-            Assert.Equal(expected, rawScanline);
         }
     }
 }

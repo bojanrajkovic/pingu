@@ -11,7 +11,6 @@ namespace Pingu.Filters
 
         internal NullFilter() { }
 
-        public byte[] ReverseFilter(byte[] scanline, byte[] previousScanline, int bytesPerPixel) => scanline;
 
         public void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel) =>
             Buffer.BlockCopy(rawScanline, 0, targetBuffer, targetOffset, rawScanline.Length);
