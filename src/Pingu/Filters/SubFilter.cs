@@ -11,6 +11,8 @@ namespace Pingu.Filters
 
         internal SubFilter () { }
 
+        public FilterType Type => FilterType.Sub;
+
         public unsafe void FilterInto(
             byte[] targetBuffer,
             int targetOffset,

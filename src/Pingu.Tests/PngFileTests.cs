@@ -26,7 +26,7 @@ namespace Pingu.Tests
             }
 
             var header = new IhdrChunk(752, 1334, 8);
-            var idat = new IdatChunk(header, rawRgbaData, FilterType.Sub);
+            var idat = new IdatChunk(header, rawRgbaData, FilterType.Dynamic);
             var end = new IendChunk();
 
             var pngFile = new PngFile() {
