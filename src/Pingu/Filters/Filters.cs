@@ -18,7 +18,7 @@ namespace Pingu.Filters
                 case FilterType.Paeth:
                     throw new NotImplementedException();
                 case FilterType.Dynamic:
-                    throw new ArgumentException("Dynamic filter should not be reached.");
+                    return DynamicFilter.Instance;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(filter));
             }

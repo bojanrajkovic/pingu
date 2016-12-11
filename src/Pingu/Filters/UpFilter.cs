@@ -11,6 +11,8 @@ namespace Pingu.Filters
 
         internal UpFilter() { }
 
+        public FilterType Type => FilterType.Up;
+
         public unsafe void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
         {
             // The Up filter reads the previous scanline, so if it's null, this must be the first
