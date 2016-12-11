@@ -22,29 +22,29 @@ namespace Pingu.Benchmarks
         [Params(4)]
         public int BytesPerPixel { get; set; }
 
-        byte[] data;
+        public byte[] Data { get; set; }
 
         static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
         [Setup]
         public void Setup()
         {
-            data = new byte[TotalBytes];
-            rng.GetBytes(data);
+            Data = new byte[TotalBytes];
+            rng.GetBytes(Data);
         }
 
         [Benchmark]
         public unsafe byte[] PointersOnly()
         {
-            byte[] targetBuffer = new byte[data.Length];
+            byte[] targetBuffer = new byte[Data.Length];
             fixed (byte* targetPtr = targetBuffer) {
-                fixed (byte* scanlinePtr = data) {
-                    Buffer.MemoryCopy(scanlinePtr, targetPtr, data.Length, BytesPerPixel);
+                fixed (byte* scanlinePtr = Data) {
+                    Buffer.MemoryCopy(scanlinePtr, targetPtr, Data.Length, BytesPerPixel);
 
                     unchecked {
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline.
-                        for (var x = BytesPerPixel; x < data.Length; x++)
+                        for (var x = BytesPerPixel; x < Data.Length; x++)
                             targetPtr[x] = (byte)((scanlinePtr[x] - scanlinePtr[x - BytesPerPixel]) % 256);
                     }
                 }
@@ -55,14 +55,14 @@ namespace Pingu.Benchmarks
         [Benchmark(Baseline = true)]
         public byte[] Naive()
         {
-            byte[] targetBuffer = new byte[data.Length];
-            Buffer.BlockCopy(data, 0, targetBuffer, 0, BytesPerPixel);
+            byte[] targetBuffer = new byte[Data.Length];
+            Buffer.BlockCopy(Data, 0, targetBuffer, 0, BytesPerPixel);
 
             unchecked {
                 // We start immediately after the first pixel--its bytes are unchanged. We only copied
                 // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline.
-                for (var x = BytesPerPixel; x < data.Length; x++)
-                    targetBuffer[x] = (byte)((data[x] - data[x - BytesPerPixel]) % 256);
+                for (var x = BytesPerPixel; x < Data.Length; x++)
+                    targetBuffer[x] = (byte)((Data[x] - Data[x - BytesPerPixel]) % 256);
             }
 
             return targetBuffer;
@@ -71,23 +71,23 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe byte[] VectorAndPointer()
         {
-            var vecSize = Vector<byte>.Count;
-            byte[] result = new byte[data.Length];
+            int vecSize = Vector<byte>.Count, length = Data.Length;
+            byte[] result = new byte[length];
 
-            var chunks = (int)Math.Floor((float)(data.Length - BytesPerPixel) / vecSize);
+            var chunks = (int)Math.Floor((double)(length - BytesPerPixel) / vecSize);
 
-            fixed (byte* dataPtr = data) {
+            fixed (byte* dataPtr = Data) {
                 fixed (byte* resultPtr = result) {
-                    Buffer.MemoryCopy(dataPtr, resultPtr, data.Length, BytesPerPixel);
+                    Buffer.MemoryCopy(dataPtr, resultPtr, length, BytesPerPixel);
 
                     for (int i = 0; i < chunks; i++) {
-                        int target = BytesPerPixel + i * vecSize;
-                        var vec = new Vector<byte>(data, target) - new Vector<byte>(data, i * vecSize);
-                        vec.CopyTo(result, target);
+                        int src = i * vecSize, dst = src + BytesPerPixel;
+                        var vec = new Vector<byte>(Data, dst) - new Vector<byte>(Data, src);
+                        vec.CopyTo(result, dst);
                     }
 
-                    int start = (BytesPerPixel + (vecSize * chunks));
-                    for (int i = start; i < data.Length; i++)
+                    int start = BytesPerPixel + (vecSize * chunks);
+                    for (int i = start; i < length; i++)
                         resultPtr[i] = unchecked((byte)(dataPtr[i] - dataPtr[i - BytesPerPixel]));
                 }
             }
