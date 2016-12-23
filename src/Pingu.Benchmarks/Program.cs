@@ -10,12 +10,14 @@ class Program
     {
         // TestAdler ();
         // TestSub();
-        TestUp();
+        // TestUp();
+        TestAvg();
 
         var switcher = new BenchmarkSwitcher(new[] {
             typeof (Adler32Implementations),
             typeof (SubImplementations),
-            typeof (UpImplementations)
+            typeof (UpImplementations),
+            typeof (AvgImplementations)
         });
 
         switcher.Run(args);
@@ -43,6 +45,35 @@ class Program
         SequenceEqualUp(naive, ptr, up.RawScanline, up.PreviousScanline);
         SequenceEqualUp(naive, unr, up.RawScanline, up.PreviousScanline);
         SequenceEqualUp(naive, vec, up.RawScanline, up.PreviousScanline);
+    }
+
+    static void TestAvg()
+    {
+        var avg = new AvgImplementations { TotalBytes = 5000, BytesPerPixel = 4, HasPreviousScanline = false };
+        byte[] naive = new byte[5000], naiveLoops = new byte[5000], pointer = new byte[5000],
+               unrolled = new byte[5000], vec = new byte[5000];
+
+        avg.Setup();
+
+        avg.NaiveWithNullablePrevious();
+        Buffer.BlockCopy(avg.TargetBuffer, 0, naive, 0, 5000);
+
+        avg.NaiveWithSeparateLoops();
+        Buffer.BlockCopy(avg.TargetBuffer, 0, naiveLoops, 0, 5000);
+
+        avg.Pointer();
+        Buffer.BlockCopy(avg.TargetBuffer, 0, pointer, 0, 5000);
+
+        avg.PointerUnrolled();
+        Buffer.BlockCopy(avg.TargetBuffer, 0, unrolled, 0, 5000);
+
+        avg.SmartVectorized();
+        Buffer.BlockCopy(avg.TargetBuffer, 0, vec, 0, 5000);
+
+        SequenceEqualUp(naive, naiveLoops, avg.RawScanline, avg.PreviousScanline);
+        SequenceEqualUp(naive, pointer, avg.RawScanline, avg.PreviousScanline);
+        SequenceEqualUp(naive, unrolled, avg.RawScanline, avg.PreviousScanline);
+        SequenceEqualUp(naive, vec, avg.RawScanline, avg.PreviousScanline);
     }
 
     static void TestSub()
