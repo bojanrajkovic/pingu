@@ -15,7 +15,7 @@ namespace Pingu.Filters
                 case FilterType.Up:
                     return UpFilter.Instance;
                 case FilterType.Average:
-                    throw new NotImplementedException();
+                    return AvgFilter.Instance;
                 case FilterType.Paeth:
                     throw new NotImplementedException();
                 case FilterType.Dynamic:
