@@ -48,9 +48,10 @@ namespace Pingu.Benchmarks
         {
             int targetOffset = 0;
 
-            Buffer.BlockCopy(RawScanline, 0, TargetBuffer, targetOffset, BytesPerPixel);
-
-            for (var i = BytesPerPixel; i < RawScanline.Length; i++)
+            int i = 0;
+            for (; i < BytesPerPixel; i++)
+                TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - ((PreviousScanline?[i] ?? 0)) / 2));
+            for (; i < RawScanline.Length; i++)
                 TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - (RawScanline[i - BytesPerPixel] + (PreviousScanline?[i] ?? 0)) / 2));
         }
 
@@ -59,14 +60,17 @@ namespace Pingu.Benchmarks
         {
             int targetOffset = 0;
 
-            Buffer.BlockCopy(RawScanline, 0, TargetBuffer, targetOffset, BytesPerPixel);
-
-            if (PreviousScanline == null)
+            if (PreviousScanline == null) {
+                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, targetOffset, BytesPerPixel);
                 for (var i = BytesPerPixel; i < RawScanline.Length; i++)
                     TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel] / 2));
-            else
-                for (var i = BytesPerPixel; i < RawScanline.Length; i++)
+            } else {
+                int i = 0;
+                for (; i < BytesPerPixel; i++)
+                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i] / 2));
+                for (; i < RawScanline.Length; i++)
                     TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - (RawScanline[i - BytesPerPixel] + PreviousScanline[i]) / 2));
+            }
         }
 
         [Benchmark]
@@ -79,14 +83,17 @@ namespace Pingu.Benchmarks
             fixed (byte* previous = PreviousScanline) {
                 byte* target = targetUnoffset + targetOffset;
 
-                Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
-
-                if (previous == null)
+                if (previous == null) {
+                    Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
                     for (var i = BytesPerPixel; i < RawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
-                else
-                    for (var i = BytesPerPixel; i < RawScanline.Length; i++)
+                } else {
+                    int i = 0;
+                    for (; i < BytesPerPixel;  i++)
+                        target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
+                    for (; i < RawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - (raw[i - BytesPerPixel] + previous[i]) / 2));
+                }
             }
         }
 
@@ -100,9 +107,8 @@ namespace Pingu.Benchmarks
             fixed (byte* previous = PreviousScanline) {
                 byte* target = targetUnoffset + targetOffset;
 
-                Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
-
                 if (previous == null) {
+                    Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
                     int i = BytesPerPixel;
                     for (; RawScanline.Length - i > 8; i += 8) {
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
@@ -117,7 +123,9 @@ namespace Pingu.Benchmarks
                     for (; i < RawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
                 } else {
-                    int i = BytesPerPixel;
+                    int i = 0;
+                    for (; i < BytesPerPixel; i++)
+                        target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
                     for (; RawScanline.Length - i > 8; i += 8) {
                         target[i] = unchecked((byte)(raw[i] - (raw[i - BytesPerPixel] + previous[i]) / 2));
                         target[i + 1] = unchecked((byte)(raw[i + 1] - (raw[i + 1 - BytesPerPixel] + previous[i + 1]) / 2));
@@ -149,9 +157,9 @@ namespace Pingu.Benchmarks
             fixed (byte* previous = PreviousScanline) {
                 byte* target = targetUnoffset + targetOffset;
 
-                Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
-
                 if (previous == null) {
+                    Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
+
                     int vecSize = Vector<byte>.Count, length = TotalBytes;
                     var chunks = (int)Math.Floor((double)(length - BytesPerPixel) / vecSize);
                     var twos = new Vector<byte>(2);
@@ -166,7 +174,9 @@ namespace Pingu.Benchmarks
                     for (int i = start; i < RawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
                 } else {
-                    int i = BytesPerPixel;
+                    int i = 0;
+                    for (; i < BytesPerPixel; i++)
+                        target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
                     for (; RawScanline.Length - i > 8; i += 8) {
                         target[i] = unchecked((byte)(raw[i] - (raw[i - BytesPerPixel] + previous[i]) / 2));
                         target[i + 1] = unchecked((byte)(raw[i + 1] - (raw[i + 1 - BytesPerPixel] + previous[i + 1]) / 2));
