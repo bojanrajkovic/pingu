@@ -52,6 +52,37 @@ namespace Pingu.Benchmarks
             return targetBuffer;
         }
 
+        [Benchmark]
+        public unsafe byte[] PointersOnlyUnrolled()
+        {
+            byte[] targetBuffer = new byte[Data.Length];
+            fixed (byte* targetPtr = targetBuffer) {
+                fixed (byte* scanlinePtr = Data) {
+                    Buffer.MemoryCopy(scanlinePtr, targetPtr, Data.Length, BytesPerPixel);
+
+                    unchecked {
+                        // We start immediately after the first pixel--its bytes are unchanged. We only copied
+                        // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
+                        // the loop a bit, as well.
+                        for (var x = BytesPerPixel; x < Data.Length - 8; x += 8) {
+                            targetPtr[x] = (byte)((scanlinePtr[x] - scanlinePtr[x - BytesPerPixel]) % 256);
+                            targetPtr[x + 1] = (byte)((scanlinePtr[x + 1] - scanlinePtr[x + 1 - BytesPerPixel]) % 256);
+                            targetPtr[x + 2] = (byte)((scanlinePtr[x + 2] - scanlinePtr[x + 2 - BytesPerPixel]) % 256);
+                            targetPtr[x + 3] = (byte)((scanlinePtr[x + 3] - scanlinePtr[x + 3 - BytesPerPixel]) % 256);
+                            targetPtr[x + 4] = (byte)((scanlinePtr[x + 4] - scanlinePtr[x + 4 - BytesPerPixel]) % 256);
+                            targetPtr[x + 5] = (byte)((scanlinePtr[x + 5] - scanlinePtr[x + 5 - BytesPerPixel]) % 256);
+                            targetPtr[x + 6] = (byte)((scanlinePtr[x + 6] - scanlinePtr[x + 6 - BytesPerPixel]) % 256);
+                            targetPtr[x + 7] = (byte)((scanlinePtr[x + 7] - scanlinePtr[x + 7 - BytesPerPixel]) % 256);
+                        }
+
+                        for (var x = Data.Length - 8; x < Data.Length; x++)
+                            targetPtr[x] = (byte)((scanlinePtr[x] - scanlinePtr[x - BytesPerPixel]) % 256);
+                    }
+                }
+            }
+            return targetBuffer;
+        }
+
         [Benchmark(Baseline = true)]
         public byte[] Naive()
         {
