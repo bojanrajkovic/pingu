@@ -11,7 +11,7 @@ class Program
         // TestAdler ();
         // TestSub();
         // TestUp();
-        TestAvg();
+        // TestAvg();
 
         var switcher = new BenchmarkSwitcher(new[] {
             typeof (Adler32Implementations),
@@ -26,24 +26,29 @@ class Program
     static void TestUp()
     {
         var up = new UpImplementations { TotalBytes = 5000 };
-        byte[] naive = new byte[5000], ptr = new byte[5000], unr = new byte[5000], vec = new byte[5000];
+        byte[] naive = new byte[5000], ptr = new byte[5000], unr = new byte[5000], vec = new byte[5000],
+               unro = new byte[5000];
 
         up.Setup();
 
         up.Naive();
         Buffer.BlockCopy(up.TargetBuffer, 0, naive, 0, 5000);
 
-        up.PointersOnly();
+        up.Pointers();
         Buffer.BlockCopy(up.TargetBuffer, 0, ptr, 0, 5000);
 
         up.PointersUnrolled();
         Buffer.BlockCopy(up.TargetBuffer, 0, unr, 0, 5000);
+
+        up.PointersUnrolledPreOffset();
+        Buffer.BlockCopy(up.TargetBuffer, 0, unro, 0, 5000);
 
         up.VectorAndPointer();
         Buffer.BlockCopy(up.TargetBuffer, 0, vec, 0, 5000);
 
         SequenceEqualUp(naive, ptr, up.RawScanline, up.PreviousScanline);
         SequenceEqualUp(naive, unr, up.RawScanline, up.PreviousScanline);
+        SequenceEqualUp(naive, unro, up.RawScanline, up.PreviousScanline);
         SequenceEqualUp(naive, vec, up.RawScanline, up.PreviousScanline);
     }
 
@@ -79,14 +84,31 @@ class Program
     static void TestSub()
     {
         var sub = new SubImplementations { BytesPerPixel = 4, TotalBytes = 5000 };
+        byte[] naive = new byte[5000], pointer = new byte[5000], unrolled = new byte[5000],
+               preoffset = new byte[5000], vec = new byte[5000];
+
         sub.Setup();
 
-        var vec = sub.VectorAndPointer();
-        var ptr = sub.PointersOnly();
-        var unr = sub.PointersOnlyUnrolled();
+        sub.Naive();
+        Buffer.BlockCopy(sub.TargetBuffer, 0, naive, 0, 5000);
 
-        SequenceEqualSub(ptr, unr, sub.Data);
-        Console.ReadKey();
+        sub.Pointers();
+        Buffer.BlockCopy(sub.TargetBuffer, 0, pointer, 0, 5000);
+
+        sub.PointersUnrolled();
+        Buffer.BlockCopy(sub.TargetBuffer, 0, unrolled, 0, 5000);
+
+        sub.PointersUnrolledPreOffset();
+        Buffer.BlockCopy(sub.TargetBuffer, 0, preoffset, 0, 5000);
+
+        sub.VectorAndPointer();
+        Buffer.BlockCopy(sub.TargetBuffer, 0, vec, 0, 5000);
+
+
+        SequenceEqualSub(naive, pointer, sub.RawScanline);
+        SequenceEqualSub(naive, unrolled, sub.RawScanline);
+        SequenceEqualSub(naive, preoffset, sub.RawScanline);
+        SequenceEqualSub(naive, vec, sub.RawScanline);
     }
 
     static void TestAdler()
@@ -99,7 +121,6 @@ class Program
         var smartest = adler.Smartest();
 
         Console.WriteLine($"Smartest: {smartest} - Smarter: {smarter} - Known: {known}");
-        Console.ReadKey();
     }
 
     static void SequenceEqualSub(byte[] expected, byte[] actual, byte[] data)
