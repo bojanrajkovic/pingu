@@ -18,32 +18,33 @@ namespace Pingu.Filters
         unsafe void UnrolledPointerFilterInto(
             byte[] targetBuffer,
             int targetOffset,
-            byte[] scanline,
+            byte[] rawScanline,
             byte[] previousScanline,
             int bytesPerPixel)
         {
-            fixed (byte* targetPtr = targetBuffer)
-            fixed (byte* scanlinePtr = scanline) {
-                Buffer.MemoryCopy(scanlinePtr, targetPtr + targetOffset, scanline.Length, bytesPerPixel);
+            fixed (byte* targetPreoffset = targetBuffer)
+            fixed (byte* raw = rawScanline) {
+                byte* target = targetPreoffset + targetOffset;
+                Buffer.MemoryCopy(raw, target, rawScanline.Length, bytesPerPixel);
 
                 unchecked {
                     // We start immediately after the first pixel--its bytes are unchanged. We only copied
                     // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                     // the loop a bit, as well.
                     int x = bytesPerPixel;
-                    for (; scanline.Length - x > 8; x += 8) {
-                        targetPtr[x + targetOffset] = (byte)((scanlinePtr[x] - scanlinePtr[x - bytesPerPixel]) % 256);
-                        targetPtr[x + 1 + targetOffset] = (byte)((scanlinePtr[x + 1] - scanlinePtr[x + 1 - bytesPerPixel]) % 256);
-                        targetPtr[x + 2 + targetOffset] = (byte)((scanlinePtr[x + 2] - scanlinePtr[x + 2 - bytesPerPixel]) % 256);
-                        targetPtr[x + 3 + targetOffset] = (byte)((scanlinePtr[x + 3] - scanlinePtr[x + 3 - bytesPerPixel]) % 256);
-                        targetPtr[x + 4 + targetOffset] = (byte)((scanlinePtr[x + 4] - scanlinePtr[x + 4 - bytesPerPixel]) % 256);
-                        targetPtr[x + 5 + targetOffset] = (byte)((scanlinePtr[x + 5] - scanlinePtr[x + 5 - bytesPerPixel]) % 256);
-                        targetPtr[x + 6 + targetOffset] = (byte)((scanlinePtr[x + 6] - scanlinePtr[x + 6 - bytesPerPixel]) % 256);
-                        targetPtr[x + 7 + targetOffset] = (byte)((scanlinePtr[x + 7] - scanlinePtr[x + 7 - bytesPerPixel]) % 256);
+                    for (; rawScanline.Length - x > 8; x += 8) {
+                        target[x] = (byte)((raw[x] - raw[x - bytesPerPixel]) % 256);
+                        target[x + 1] = (byte)((raw[x + 1] - raw[x + 1 - bytesPerPixel]) % 256);
+                        target[x + 2] = (byte)((raw[x + 2] - raw[x + 2 - bytesPerPixel]) % 256);
+                        target[x + 3] = (byte)((raw[x + 3] - raw[x + 3 - bytesPerPixel]) % 256);
+                        target[x + 4] = (byte)((raw[x + 4] - raw[x + 4 - bytesPerPixel]) % 256);
+                        target[x + 5] = (byte)((raw[x + 5] - raw[x + 5 - bytesPerPixel]) % 256);
+                        target[x + 6] = (byte)((raw[x + 6] - raw[x + 6 - bytesPerPixel]) % 256);
+                        target[x + 7] = (byte)((raw[x + 7] - raw[x + 7 - bytesPerPixel]) % 256);
                     }
 
-                    for (; x < scanline.Length; x++)
-                        targetPtr[x + targetOffset] = (byte)((scanlinePtr[x] - scanlinePtr[x - bytesPerPixel]) % 256);
+                    for (; x < rawScanline.Length; x++)
+                        target[x] = (byte)((raw[x] - raw[x - bytesPerPixel]) % 256);
                 }
             }
         }
