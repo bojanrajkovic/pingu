@@ -25,9 +25,8 @@ namespace Pingu.Filters
             fixed (byte* previous = previousScanline) {
                 byte* target = targetUnoffset + targetOffset;
 
-                Buffer.MemoryCopy(raw, target, bytesPerPixel, bytesPerPixel);
-
                 if (previous == null) {
+                    Buffer.MemoryCopy(raw, target, bytesPerPixel, bytesPerPixel);
                     int i = bytesPerPixel;
                     for (; rawScanline.Length - i > 8; i += 8) {
                         target[i] = unchecked((byte)(raw[i] - raw[i - bytesPerPixel] / 2));
@@ -42,7 +41,9 @@ namespace Pingu.Filters
                     for (; i < rawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - raw[i - bytesPerPixel] / 2));
                 } else {
-                    int i = bytesPerPixel;
+                    int i = 0;
+                    for (; i < bytesPerPixel; i++)
+                        target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
                     for (; rawScanline.Length - i > 8; i += 8) {
                         target[i] = unchecked((byte)(raw[i] - (raw[i - bytesPerPixel] + previous[i]) / 2));
                         target[i + 1] = unchecked((byte)(raw[i + 1] - (raw[i + 1 - bytesPerPixel] + previous[i + 1]) / 2));
