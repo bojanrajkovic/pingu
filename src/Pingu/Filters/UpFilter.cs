@@ -22,21 +22,22 @@ namespace Pingu.Filters
         {
             fixed (byte* raw = rawScanline)
             fixed (byte* previous = previousScanline)
-            fixed (byte* target = targetBuffer) {
+            fixed (byte* targetUnoffset = targetBuffer) {
+                byte* target = targetUnoffset + targetOffset;
                 int i = 0;
                 for (; rawScanline.Length - i > 8; i += 8) {
-                    target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
-                    target[i + 1 + targetOffset] = (byte)((raw[i + 1] - previous[i + 1]) % 256);
-                    target[i + 2 + targetOffset] = (byte)((raw[i + 2] - previous[i + 2]) % 256);
-                    target[i + 3 + targetOffset] = (byte)((raw[i + 3] - previous[i + 3]) % 256);
-                    target[i + 4 + targetOffset] = (byte)((raw[i + 4] - previous[i + 4]) % 256);
-                    target[i + 5 + targetOffset] = (byte)((raw[i + 5] - previous[i + 5]) % 256);
-                    target[i + 6 + targetOffset] = (byte)((raw[i + 6] - previous[i + 6]) % 256);
-                    target[i + 7 + targetOffset] = (byte)((raw[i + 7] - previous[i + 7]) % 256);
+                    target[i] = (byte)((raw[i] - previous[i]) % 256);
+                    target[i + 1] = (byte)((raw[i + 1] - previous[i + 1]) % 256);
+                    target[i + 2] = (byte)((raw[i + 2] - previous[i + 2]) % 256);
+                    target[i + 3] = (byte)((raw[i + 3] - previous[i + 3]) % 256);
+                    target[i + 4] = (byte)((raw[i + 4] - previous[i + 4]) % 256);
+                    target[i + 5] = (byte)((raw[i + 5] - previous[i + 5]) % 256);
+                    target[i + 6] = (byte)((raw[i + 6] - previous[i + 6]) % 256);
+                    target[i + 7] = (byte)((raw[i + 7] - previous[i + 7]) % 256);
                 }
 
                 for (; i < rawScanline.Length; i++)
-                    target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
+                    target[i] = (byte)((raw[i] - previous[i]) % 256);
             }
         }
 
