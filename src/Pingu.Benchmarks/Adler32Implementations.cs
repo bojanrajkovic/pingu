@@ -3,28 +3,16 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Attributes.Jobs;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Order;
 
 namespace Pingu.Benchmarks
 {
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
-    [RankColumn(NumeralSystem.Stars)]
-    [LegacyJitX64Job, RyuJitX64Job, MonoJob]
-    [Config(typeof(Config))]
+    [RankColumn(NumeralSystem.Arabic)]
+    [RyuJitX64Job, LegacyJitX64Job, MonoJob]
     public class Adler32Implementations
     {
-        class Config : ManualConfig
-        {
-            public Config ()
-            {
-                Add(Job.Mono.With(Jit.Llvm).WithId("LlvmMono"));
-            }
-        }
-
         Random rand = new Random();
         byte[] data = new byte[77];
 
