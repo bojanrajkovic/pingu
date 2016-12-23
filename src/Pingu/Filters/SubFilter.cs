@@ -11,24 +11,11 @@ namespace Pingu.Filters
 
         public static SubFilter Instance => lazy.Value;
 
-        static readonly bool UseVectors = true;
-
-        static SubFilter ()
-        {
-            // If we're on Mono, don't use vectors.
-            if (System.Type.GetType("Mono.Runtime") != null)
-                UseVectors = false;
-
-            // If Vectors aren't hardware accelerated, use pointers.
-            if (!Vector.IsHardwareAccelerated)
-                UseVectors = false;
-        }
-
         internal SubFilter () { }
 
         public FilterType Type => FilterType.Sub;
 
-        unsafe void PointersOnly(
+        unsafe void UnrolledPointerFilterInto(
             byte[] targetBuffer,
             int targetOffset,
             byte[] scanline,
@@ -43,7 +30,8 @@ namespace Pingu.Filters
                     // We start immediately after the first pixel--its bytes are unchanged. We only copied
                     // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                     // the loop a bit, as well.
-                    for (var x = bytesPerPixel; x < scanline.Length - 8; x += 8) {
+                    int x = bytesPerPixel;
+                    for (; scanline.Length - x > 8; x += 8) {
                         targetPtr[x + targetOffset] = (byte)((scanlinePtr[x] - scanlinePtr[x - bytesPerPixel]) % 256);
                         targetPtr[x + 1 + targetOffset] = (byte)((scanlinePtr[x + 1] - scanlinePtr[x + 1 - bytesPerPixel]) % 256);
                         targetPtr[x + 2 + targetOffset] = (byte)((scanlinePtr[x + 2] - scanlinePtr[x + 2 - bytesPerPixel]) % 256);
@@ -54,13 +42,13 @@ namespace Pingu.Filters
                         targetPtr[x + 7 + targetOffset] = (byte)((scanlinePtr[x + 7] - scanlinePtr[x + 7 - bytesPerPixel]) % 256);
                     }
 
-                    for (var x = scanline.Length - 8; x < scanline.Length; x++)
+                    for (; x < scanline.Length; x++)
                         targetPtr[x + targetOffset] = (byte)((scanlinePtr[x] - scanlinePtr[x - bytesPerPixel]) % 256);
                 }
             }
         }
 
-        unsafe void VectorAndPointer(
+        unsafe void VectorAndPointerFilterInto(
             byte[] targetBuffer,
             int targetOffset,
             byte[] scanline,
@@ -96,10 +84,10 @@ namespace Pingu.Filters
         {
             // This is not a performance issue--the JITter will treat a `static readonly bool` as a constant
             // and will do DCE to eliminate the wrong branch here.
-            if (UseVectors)
-                VectorAndPointer(targetBuffer, targetOffset, scanline, previousScanline, bytesPerPixel);
+            if (DefaultFilters.UseVectors)
+                VectorAndPointerFilterInto(targetBuffer, targetOffset, scanline, previousScanline, bytesPerPixel);
             else
-                PointersOnly(targetBuffer, targetOffset, scanline, previousScanline, bytesPerPixel);
+                UnrolledPointerFilterInto(targetBuffer, targetOffset, scanline, previousScanline, bytesPerPixel);
         }
     }
 }
