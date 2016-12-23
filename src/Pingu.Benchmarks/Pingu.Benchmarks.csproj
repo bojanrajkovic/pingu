@@ -9,6 +9,7 @@
     <TargetFrameworkIdentifier>.NETCoreApp</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v1.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
