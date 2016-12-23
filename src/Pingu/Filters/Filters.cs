@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Pingu.Filters
 {
@@ -22,6 +23,19 @@ namespace Pingu.Filters
                 default:
                     throw new ArgumentOutOfRangeException(nameof(filter));
             }
+        }
+
+        public static readonly bool UseVectors = true;
+
+        static DefaultFilters()
+        {
+            // If we're on Mono, don't use vectors.
+            if (Type.GetType("Mono.Runtime") != null)
+                UseVectors = false;
+
+            // If Vectors aren't hardware accelerated, use pointers.
+            if (!Vector.IsHardwareAccelerated)
+                UseVectors = false;
         }
     }
 }

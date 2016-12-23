@@ -64,7 +64,8 @@ namespace Pingu.Benchmarks
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                         // the loop a bit, as well.
-                        for (var x = BytesPerPixel; x < Data.Length - 8; x += 8) {
+                        int x = BytesPerPixel;
+                        for (; Data.Length - x > 8; x += 8) {
                             targetPtr[x] = (byte)((scanlinePtr[x] - scanlinePtr[x - BytesPerPixel]) % 256);
                             targetPtr[x + 1] = (byte)((scanlinePtr[x + 1] - scanlinePtr[x + 1 - BytesPerPixel]) % 256);
                             targetPtr[x + 2] = (byte)((scanlinePtr[x + 2] - scanlinePtr[x + 2 - BytesPerPixel]) % 256);
@@ -75,7 +76,7 @@ namespace Pingu.Benchmarks
                             targetPtr[x + 7] = (byte)((scanlinePtr[x + 7] - scanlinePtr[x + 7 - BytesPerPixel]) % 256);
                         }
 
-                        for (var x = Data.Length - 8; x < Data.Length; x++)
+                        for (; x < Data.Length; x++)
                             targetPtr[x] = (byte)((scanlinePtr[x] - scanlinePtr[x - BytesPerPixel]) % 256);
                     }
                 }

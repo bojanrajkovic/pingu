@@ -64,7 +64,8 @@ namespace Pingu.Benchmarks
             fixed (byte* raw = RawScanline)
             fixed (byte* previous = PreviousScanline)
             fixed (byte* target = TargetBuffer) {
-                for (var i = 0; RawScanline.Length - i > 8; i += 8) {
+                int i = 0;
+                for (; RawScanline.Length - i > 8; i += 8) {
                     target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
                     target[i + 1 + targetOffset] = (byte)((raw[i + 1] - previous[i + 1]) % 256);
                     target[i + 2 + targetOffset] = (byte)((raw[i + 2] - previous[i + 2]) % 256);
@@ -75,7 +76,7 @@ namespace Pingu.Benchmarks
                     target[i + 7 + targetOffset] = (byte)((raw[i + 7] - previous[i + 7]) % 256);
                 }
 
-                for (var i = RawScanline.Length - 8; i < RawScanline.Length; i++)
+                for (; i < RawScanline.Length; i++)
                     target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
             }
         }
