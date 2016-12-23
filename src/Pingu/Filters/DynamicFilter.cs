@@ -9,7 +9,7 @@ namespace Pingu.Filters
         static readonly IFilter[] PossibleFilters = new IFilter[] {
             SubFilter.Instance,
             UpFilter.Instance,
-            // AverageFilter.Instance,
+            AvgFilter.Instance,
             // PaethFilter.Instance
         };
 
