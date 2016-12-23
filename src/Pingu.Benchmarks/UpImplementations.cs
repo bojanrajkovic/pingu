@@ -11,8 +11,8 @@ using BenchmarkDotNet.Order;
 namespace Pingu.Benchmarks
 {
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
-    [RankColumn(NumeralSystem.Stars)]
-    [LegacyJitX64Job, RyuJitX64Job, MonoJob]
+    [RankColumn(NumeralSystem.Arabic)]
+    [RyuJitX64Job, LegacyJitX64Job, MonoJob]
     public class UpImplementations
     {
         [Params(5000)]
@@ -44,7 +44,7 @@ namespace Pingu.Benchmarks
         }
 
         [Benchmark]
-        public unsafe void PointersOnly()
+        public unsafe void Pointers()
         {
             int targetOffset = 0;
 
@@ -78,6 +78,32 @@ namespace Pingu.Benchmarks
 
                 for (; i < RawScanline.Length; i++)
                     target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
+            }
+        }
+
+        [Benchmark]
+        public unsafe void PointersUnrolledPreOffset()
+        {
+            int targetOffset = 0;
+
+            fixed (byte* raw = RawScanline)
+            fixed (byte* previous = PreviousScanline)
+            fixed (byte* targetUnoffset = TargetBuffer) {
+                byte* target = targetUnoffset + targetOffset;
+                int i = 0;
+                for (; RawScanline.Length - i > 8; i += 8) {
+                    target[i] = (byte)((raw[i] - previous[i]) % 256);
+                    target[i + 1] = (byte)((raw[i + 1] - previous[i + 1]) % 256);
+                    target[i + 2] = (byte)((raw[i + 2] - previous[i + 2]) % 256);
+                    target[i + 3] = (byte)((raw[i + 3] - previous[i + 3]) % 256);
+                    target[i + 4] = (byte)((raw[i + 4] - previous[i + 4]) % 256);
+                    target[i + 5] = (byte)((raw[i + 5] - previous[i + 5]) % 256);
+                    target[i + 6] = (byte)((raw[i + 6] - previous[i + 6]) % 256);
+                    target[i + 7] = (byte)((raw[i + 7] - previous[i + 7]) % 256);
+                }
+
+                for (; i < RawScanline.Length; i++)
+                    target[i] = (byte)((raw[i] - previous[i]) % 256);
             }
         }
 
