@@ -12,8 +12,12 @@ namespace Pingu.Tests
     public class PngFileTests
     {
         [Theory]
-        [InlineData("Pingu.Tests.Zooey.RGBA32")]
-        public async Task Can_write_PNG_file(string imageName)
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.None)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Sub)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Up)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Average)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Dynamic)]
+        public async Task Can_write_PNG_file(string imageName, FilterType type)
         {
             var asm = typeof(PngFileTests).GetTypeInfo().Assembly;
             var resource = asm.GetManifestResourceStream(imageName);
@@ -26,7 +30,7 @@ namespace Pingu.Tests
             }
 
             var header = new IhdrChunk(752, 1334, 8);
-            var idat = new IdatChunk(header, rawRgbaData, FilterType.Dynamic);
+            var idat = new IdatChunk(header, rawRgbaData, type);
             var end = new IendChunk();
 
             var pngFile = new PngFile() {
@@ -35,7 +39,7 @@ namespace Pingu.Tests
                 end
             };
 
-            var path = Path.Combine(Path.GetDirectoryName(asm.Location), "Zooey.png");
+            var path = Path.Combine(Path.GetDirectoryName(asm.Location), $"Zooey-{type}.png");
             using (var fs = new FileStream(path, FileMode.Create))
                 await pngFile.WriteFileAsync(fs);
 
