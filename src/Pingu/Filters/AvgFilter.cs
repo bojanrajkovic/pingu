@@ -26,36 +26,57 @@ namespace Pingu.Filters
                 byte* target = targetUnoffset + targetOffset;
 
                 if (previous == null) {
-                    Buffer.MemoryCopy(raw, target, bytesPerPixel, bytesPerPixel);
-                    int i = bytesPerPixel;
-                    for (; rawScanline.Length - i > 8; i += 8) {
-                        target[i] = unchecked((byte)(raw[i] - raw[i - bytesPerPixel] / 2));
-                        target[i + 1] = unchecked((byte)(raw[i + 1] - raw[i + 1 - bytesPerPixel] / 2));
-                        target[i + 2] = unchecked((byte)(raw[i + 2] - raw[i + 2 - bytesPerPixel] / 2));
-                        target[i + 3] = unchecked((byte)(raw[i + 3] - raw[i + 3 - bytesPerPixel] / 2));
-                        target[i + 4] = unchecked((byte)(raw[i + 4] - raw[i + 4 - bytesPerPixel] / 2));
-                        target[i + 5] = unchecked((byte)(raw[i + 5] - raw[i + 5 - bytesPerPixel] / 2));
-                        target[i + 6] = unchecked((byte)(raw[i + 6] - raw[i + 6 - bytesPerPixel] / 2));
-                        target[i + 7] = unchecked((byte)(raw[i + 7] - raw[i + 7 - bytesPerPixel] / 2));
+                    // Basically Sub, but with the Raw(x-bpp) value divided by 2
+                    Buffer.MemoryCopy(raw, target, rawScanline.Length, bytesPerPixel);
+                    unchecked {
+                        int x = bytesPerPixel;
+                        target += bytesPerPixel;
+                        byte* rawm = raw + bytesPerPixel, rawBpp = raw;
+
+                        for (; rawScanline.Length - x > 8; x += 8) {
+                            target[0] = (byte)(rawm[0] - rawBpp[0] / 2);
+                            target[1] = (byte)(rawm[1] - rawBpp[1] / 2);
+                            target[2] = (byte)(rawm[2] - rawBpp[2] / 2);
+                            target[3] = (byte)(rawm[3] - rawBpp[3] / 2);
+                            target[4] = (byte)(rawm[4] - rawBpp[4] / 2);
+                            target[5] = (byte)(rawm[5] - rawBpp[5] / 2);
+                            target[6] = (byte)(rawm[6] - rawBpp[6] / 2);
+                            target[7] = (byte)(rawm[7] - rawBpp[7] / 2);
+                            target += 8; rawm += 8; rawBpp += 8;
+                        }
+
+                        for (; x < rawScanline.Length; x++) {
+                            target[0] = (byte)(rawm[0] - rawBpp[0] / 2);
+                            target++; rawm++; rawBpp++;
+                        }
                     }
-                    for (; i < rawScanline.Length; i++)
-                        target[i] = unchecked((byte)(raw[i] - raw[i - bytesPerPixel] / 2));
                 } else {
                     int i = 0;
-                    for (; i < bytesPerPixel; i++)
-                        target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
-                    for (; rawScanline.Length - i > 8; i += 8) {
-                        target[i] = unchecked((byte)(raw[i] - (raw[i - bytesPerPixel] + previous[i]) / 2));
-                        target[i + 1] = unchecked((byte)(raw[i + 1] - (raw[i + 1 - bytesPerPixel] + previous[i + 1]) / 2));
-                        target[i + 2] = unchecked((byte)(raw[i + 2] - (raw[i + 2 - bytesPerPixel] + previous[i + 2]) / 2));
-                        target[i + 3] = unchecked((byte)(raw[i + 3] - (raw[i + 3 - bytesPerPixel] + previous[i + 3]) / 2));
-                        target[i + 4] = unchecked((byte)(raw[i + 4] - (raw[i + 4 - bytesPerPixel] + previous[i + 4]) / 2));
-                        target[i + 5] = unchecked((byte)(raw[i + 5] - (raw[i + 5 - bytesPerPixel] + previous[i + 5]) / 2));
-                        target[i + 6] = unchecked((byte)(raw[i + 6] - (raw[i + 6 - bytesPerPixel] + previous[i + 6]) / 2));
-                        target[i + 7] = unchecked((byte)(raw[i + 7] - (raw[i + 7 - bytesPerPixel] + previous[i + 7]) / 2));
+                    byte* rawm = raw, prev = previous, rawBpp = raw - bytesPerPixel;
+
+                    unchecked {
+                        for (; i < bytesPerPixel; i++) {
+                            target[0] = (byte)(rawm[0] - prev[0] / 2);
+                            target++; rawm++; prev++; rawBpp++;
+                        }
+
+                        for (; rawScanline.Length - i > 8; i += 8) {
+                            target[0] = (byte)(rawm[0] - (rawBpp[0] + prev[0]) / 2);
+                            target[1] = (byte)(rawm[1] - (rawBpp[1] + prev[1]) / 2);
+                            target[2] = (byte)(rawm[2] - (rawBpp[2] + prev[2]) / 2);
+                            target[3] = (byte)(rawm[3] - (rawBpp[3] + prev[3]) / 2);
+                            target[4] = (byte)(rawm[4] - (rawBpp[4] + prev[4]) / 2);
+                            target[5] = (byte)(rawm[5] - (rawBpp[5] + prev[5]) / 2);
+                            target[6] = (byte)(rawm[6] - (rawBpp[6] + prev[6]) / 2);
+                            target[7] = (byte)(rawm[7] - (rawBpp[7] + prev[7]) / 2);
+                            target += 8; rawm += 8; prev += 8; rawBpp += 8;
+                        }
+
+                        for (; i < rawScanline.Length; i++) {
+                            target[0] = (byte)(rawm[0] - (rawBpp[0] + prev[0]) / 2);
+                            target++; rawm++; prev++; rawBpp++;
+                        }
                     }
-                    for (; i < rawScanline.Length; i++)
-                        target[i] = unchecked((byte)(raw[i] - (raw[i - bytesPerPixel] + previous[i]) / 2));
                 }
             }
         }

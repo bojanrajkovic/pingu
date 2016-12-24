@@ -99,31 +99,35 @@ class Program
 
     static void TestAvg()
     {
-        var avg = new AvgImplementations { TotalBytes = 5000, BytesPerPixel = 4, HasPreviousScanline = false };
-        byte[] naive = new byte[5000], naiveLoops = new byte[5000], pointer = new byte[5000],
-               unrolled = new byte[5000], vec = new byte[5000];
+        var avg = new AvgImplementations { TotalBytes = 5000, BytesPerPixel = 4, HasPreviousScanline = true };
+        byte[] naive = new byte[avg.TotalBytes], naiveLoops = new byte[avg.TotalBytes], pointer = new byte[avg.TotalBytes],
+               unrolled = new byte[avg.TotalBytes], vec = new byte[avg.TotalBytes], motion = new byte [avg.TotalBytes];
 
         avg.Setup();
 
         avg.NaiveWithNullablePrevious();
-        Buffer.BlockCopy(avg.TargetBuffer, 0, naive, 0, 5000);
+        Buffer.BlockCopy(avg.TargetBuffer, 0, naive, 0, avg.TotalBytes);
 
         avg.NaiveWithSeparateLoops();
-        Buffer.BlockCopy(avg.TargetBuffer, 0, naiveLoops, 0, 5000);
+        Buffer.BlockCopy(avg.TargetBuffer, 0, naiveLoops, 0, avg.TotalBytes);
 
         avg.Pointer();
-        Buffer.BlockCopy(avg.TargetBuffer, 0, pointer, 0, 5000);
+        Buffer.BlockCopy(avg.TargetBuffer, 0, pointer, 0, avg.TotalBytes);
 
         avg.PointerUnrolled();
-        Buffer.BlockCopy(avg.TargetBuffer, 0, unrolled, 0, 5000);
+        Buffer.BlockCopy(avg.TargetBuffer, 0, unrolled, 0, avg.TotalBytes);
 
         avg.SmartVectorized();
-        Buffer.BlockCopy(avg.TargetBuffer, 0, vec, 0, 5000);
+        Buffer.BlockCopy(avg.TargetBuffer, 0, vec, 0, avg.TotalBytes);
+
+        avg.PointerUnrolledMotion();
+        Buffer.BlockCopy(avg.TargetBuffer, 0, motion, 0, avg.TotalBytes);
 
         SequenceEqualUp(naive, naiveLoops, avg.RawScanline, avg.PreviousScanline);
         SequenceEqualUp(naive, pointer, avg.RawScanline, avg.PreviousScanline);
         SequenceEqualUp(naive, unrolled, avg.RawScanline, avg.PreviousScanline);
         SequenceEqualUp(naive, vec, avg.RawScanline, avg.PreviousScanline);
+        SequenceEqualUp(naive, motion, avg.RawScanline, avg.PreviousScanline);
     }
 
     static void TestSub()
