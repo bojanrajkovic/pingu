@@ -10,7 +10,7 @@ namespace Pingu.Filters
             SubFilter.Instance,
             UpFilter.Instance,
             AvgFilter.Instance,
-            // PaethFilter.Instance
+            PaethFilter.Instance
         };
 
         private static readonly Lazy<DynamicFilter> lazy

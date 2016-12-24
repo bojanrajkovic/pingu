@@ -12,15 +12,51 @@ class Program
         // TestSub();
         // TestUp();
         // TestAvg();
+        // TestPaeth();
 
         var switcher = new BenchmarkSwitcher(new[] {
             typeof (Adler32Implementations),
             typeof (SubImplementations),
             typeof (UpImplementations),
-            typeof (AvgImplementations)
+            typeof (AvgImplementations),
+            typeof (PaethImplementations)
         });
 
         switcher.Run(args);
+    }
+
+    static void TestPaeth()
+    {
+        var paeth = new PaethImplementations { TotalBytes = 5000, HasPreviousScanline = true, BytesPerPixel = 4 };
+        byte[] naiveMath = new byte[paeth.TotalBytes], naiveFast = new byte[paeth.TotalBytes],
+               naiveVec = new byte[paeth.TotalBytes], unrolledMath = new byte[paeth.TotalBytes],
+               unrolledFast = new byte[paeth.TotalBytes], unrolledVec = new byte[paeth.TotalBytes];
+
+        paeth.Setup();
+
+        paeth.NaiveWithMathAbs();
+        Buffer.BlockCopy(paeth.TargetBuffer, 0, naiveMath, 0, paeth.TotalBytes);
+
+        paeth.NaiveWithFastAbs();
+        Buffer.BlockCopy(paeth.TargetBuffer, 0, naiveFast, 0, paeth.TotalBytes);
+
+        paeth.NaiveWithVecAbs();
+        Buffer.BlockCopy(paeth.TargetBuffer, 0, naiveVec, 0, paeth.TotalBytes);
+
+        paeth.UnrolledWithMathAbs();
+        Buffer.BlockCopy(paeth.TargetBuffer, 0, unrolledMath, 0, paeth.TotalBytes);
+
+        paeth.UnrolledWithFastAbs();
+        Buffer.BlockCopy(paeth.TargetBuffer, 0, unrolledFast, 0, paeth.TotalBytes);
+
+        paeth.UnrolledWithVecAbs();
+        Buffer.BlockCopy(paeth.TargetBuffer, 0, unrolledVec, 0, paeth.TotalBytes);
+
+        SequenceEqualUp(naiveMath, naiveFast, paeth.RawScanline, paeth.PreviousScanline);
+        SequenceEqualUp(naiveMath, naiveVec, paeth.RawScanline, paeth.PreviousScanline);
+        SequenceEqualUp(naiveMath, unrolledMath, paeth.RawScanline, paeth.PreviousScanline);
+        SequenceEqualUp(naiveMath, unrolledFast, paeth.RawScanline, paeth.PreviousScanline);
+        SequenceEqualUp(naiveMath, unrolledVec, paeth.RawScanline, paeth.PreviousScanline);
     }
 
     static void TestUp()
