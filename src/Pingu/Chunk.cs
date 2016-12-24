@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace Pingu
             await stream.WriteAsync(crc32, 0, crc32.Length);
         }
 
-        byte[] CalculateCRC32(byte[] data) => GetBytesForInteger(Crc32.Compute(data));
+        byte[] CalculateCRC32(byte[] data) => GetBytesForInteger((int) Crc32Helper.UpdateCrc32(0, data, 0, data.Length));
 
         public abstract string Name { get; }
         public abstract int Length { get; }
