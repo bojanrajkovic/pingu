@@ -32,19 +32,26 @@ namespace Pingu.Filters
                     // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                     // the loop a bit, as well.
                     int x = bytesPerPixel;
+
+                    target += bytesPerPixel;
+                    byte* rawm = raw + bytesPerPixel, rawBpp = raw;
+
                     for (; rawScanline.Length - x > 8; x += 8) {
-                        target[x] = (byte)(raw[x] - raw[x - bytesPerPixel]);
-                        target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - bytesPerPixel]);
-                        target[x + 2] = (byte)(raw[x + 2] - raw[x + 2 - bytesPerPixel]);
-                        target[x + 3] = (byte)(raw[x + 3] - raw[x + 3 - bytesPerPixel]);
-                        target[x + 4] = (byte)(raw[x + 4] - raw[x + 4 - bytesPerPixel]);
-                        target[x + 5] = (byte)(raw[x + 5] - raw[x + 5 - bytesPerPixel]);
-                        target[x + 6] = (byte)(raw[x + 6] - raw[x + 6 - bytesPerPixel]);
-                        target[x + 7] = (byte)(raw[x + 7] - raw[x + 7 - bytesPerPixel]);
+                        target[0] = (byte)(rawm[0] - rawBpp[0]);
+                        target[1] = (byte)(rawm[1] - rawBpp[1]);
+                        target[2] = (byte)(rawm[2] - rawBpp[2]);
+                        target[3] = (byte)(rawm[3] - rawBpp[3]);
+                        target[4] = (byte)(rawm[4] - rawBpp[4]);
+                        target[5] = (byte)(rawm[5] - rawBpp[5]);
+                        target[6] = (byte)(rawm[6] - rawBpp[6]);
+                        target[7] = (byte)(rawm[7] - rawBpp[7]);
+                        target += 8; rawm += 8; rawBpp += 8;
                     }
 
-                    for (; x < rawScanline.Length; x++)
-                        target[x] = (byte)(raw[x] - raw[x - bytesPerPixel]);
+                    for (; x < rawScanline.Length; x++) {
+                        target[0] = (byte)(rawm[0] - rawBpp[0]);
+                        target++; rawm++; rawBpp++;
+                    }
                 }
             }
         }

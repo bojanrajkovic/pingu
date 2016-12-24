@@ -117,6 +117,45 @@ namespace Pingu.Benchmarks
             }
         }
 
+        [Benchmark]
+        public unsafe void PointersUnrolledPreOffsetMotion()
+        {
+            int targetOffset = 0;
+
+            fixed (byte* targetPreoffset = TargetBuffer)
+            fixed (byte* raw = RawScanline) {
+                byte* target = targetPreoffset + targetOffset;
+                Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
+
+                unchecked {
+                    // We start immediately after the first pixel--its bytes are unchanged. We only copied
+                    // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
+                    // the loop a bit, as well.
+                    int x = BytesPerPixel;
+
+                    target += BytesPerPixel;
+                    byte* rawm = raw + BytesPerPixel, rawBpp = raw;
+
+                    for (; RawScanline.Length - x > 8; x += 8) {
+                        target[0] = (byte)(rawm[0] - rawBpp[0]);
+                        target[1] = (byte)(rawm[1] - rawBpp[1]);
+                        target[2] = (byte)(rawm[2] - rawBpp[2]);
+                        target[3] = (byte)(rawm[3] - rawBpp[3]);
+                        target[4] = (byte)(rawm[4] - rawBpp[4]);
+                        target[5] = (byte)(rawm[5] - rawBpp[5]);
+                        target[6] = (byte)(rawm[6] - rawBpp[6]);
+                        target[7] = (byte)(rawm[7] - rawBpp[7]);
+                        target += 8; rawm += 8; rawBpp += 8;
+                    }
+
+                    for (; x < RawScanline.Length; x++) {
+                        target[0] = (byte)(rawm[0] - rawBpp[0]);
+                        target++; rawm++; rawBpp++;
+                    }
+                }
+            }
+        }
+
         [Benchmark(Baseline = true)]
         public void Naive()
         {
