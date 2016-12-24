@@ -49,7 +49,7 @@ namespace Pingu.Benchmarks
                     // We start immediately after the first pixel--its bytes are unchanged. We only copied
                     // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline.
                     for (var x = BytesPerPixel; x < RawScanline.Length; x++)
-                        targetPtr[x + targetOffset] = (byte)((scanlinePtr[x] - scanlinePtr[x - BytesPerPixel]) % 256);
+                        targetPtr[x + targetOffset] = (byte)(scanlinePtr[x] - scanlinePtr[x - BytesPerPixel]);
                 }
             }
         }
@@ -69,18 +69,18 @@ namespace Pingu.Benchmarks
                     // the loop a bit, as well.
                     int x = BytesPerPixel;
                     for (; RawScanline.Length - x > 8; x += 8) {
-                        target[x + targetOffset] = (byte)((raw[x] - raw[x - BytesPerPixel]) % 256);
-                        target[x + 1 + targetOffset] = (byte)((raw[x + 1] - raw[x + 1 - BytesPerPixel]) % 256);
-                        target[x + 2 + targetOffset] = (byte)((raw[x + 2] - raw[x + 2 - BytesPerPixel]) % 256);
-                        target[x + 3 + targetOffset] = (byte)((raw[x + 3] - raw[x + 3 - BytesPerPixel]) % 256);
-                        target[x + 4 + targetOffset] = (byte)((raw[x + 4] - raw[x + 4 - BytesPerPixel]) % 256);
-                        target[x + 5 + targetOffset] = (byte)((raw[x + 5] - raw[x + 5 - BytesPerPixel]) % 256);
-                        target[x + 6 + targetOffset] = (byte)((raw[x + 6] - raw[x + 6 - BytesPerPixel]) % 256);
-                        target[x + 7 + targetOffset] = (byte)((raw[x + 7] - raw[x + 7 - BytesPerPixel]) % 256);
+                        target[x + targetOffset] = (byte)(raw[x] - raw[x - BytesPerPixel]);
+                        target[x + 1 + targetOffset] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
+                        target[x + 2 + targetOffset] = (byte)(raw[x + 2] - raw[x + 2 - BytesPerPixel]);
+                        target[x + 3 + targetOffset] = (byte)(raw[x + 3] - raw[x + 3 - BytesPerPixel]);
+                        target[x + 4 + targetOffset] = (byte)(raw[x + 4] - raw[x + 4 - BytesPerPixel]);
+                        target[x + 5 + targetOffset] = (byte)(raw[x + 5] - raw[x + 5 - BytesPerPixel]);
+                        target[x + 6 + targetOffset] = (byte)(raw[x + 6] - raw[x + 6 - BytesPerPixel]);
+                        target[x + 7 + targetOffset] = (byte)(raw[x + 7] - raw[x + 7 - BytesPerPixel]);
                     }
 
                     for (; x < RawScanline.Length; x++)
-                        target[x + targetOffset] = (byte)((raw[x] - raw[x - BytesPerPixel]) % 256);
+                        target[x + targetOffset] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                 }
             }
         }
@@ -101,18 +101,18 @@ namespace Pingu.Benchmarks
                     // the loop a bit, as well.
                     int x = BytesPerPixel;
                     for (; RawScanline.Length - x > 8; x += 8) {
-                        target[x] = (byte)((raw[x] - raw[x - BytesPerPixel]) % 256);
-                        target[x + 1] = (byte)((raw[x + 1] - raw[x + 1 - BytesPerPixel]) % 256);
-                        target[x + 2] = (byte)((raw[x + 2] - raw[x + 2 - BytesPerPixel]) % 256);
-                        target[x + 3] = (byte)((raw[x + 3] - raw[x + 3 - BytesPerPixel]) % 256);
-                        target[x + 4] = (byte)((raw[x + 4] - raw[x + 4 - BytesPerPixel]) % 256);
-                        target[x + 5] = (byte)((raw[x + 5] - raw[x + 5 - BytesPerPixel]) % 256);
-                        target[x + 6] = (byte)((raw[x + 6] - raw[x + 6 - BytesPerPixel]) % 256);
-                        target[x + 7] = (byte)((raw[x + 7] - raw[x + 7 - BytesPerPixel]) % 256);
+                        target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
+                        target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
+                        target[x + 2] = (byte)(raw[x + 2] - raw[x + 2 - BytesPerPixel]);
+                        target[x + 3] = (byte)(raw[x + 3] - raw[x + 3 - BytesPerPixel]);
+                        target[x + 4] = (byte)(raw[x + 4] - raw[x + 4 - BytesPerPixel]);
+                        target[x + 5] = (byte)(raw[x + 5] - raw[x + 5 - BytesPerPixel]);
+                        target[x + 6] = (byte)(raw[x + 6] - raw[x + 6 - BytesPerPixel]);
+                        target[x + 7] = (byte)(raw[x + 7] - raw[x + 7 - BytesPerPixel]);
                     }
 
                     for (; x < RawScanline.Length; x++)
-                        target[x] = (byte)((raw[x] - raw[x - BytesPerPixel]) % 256);
+                        target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace Pingu.Benchmarks
                 // We start immediately after the first pixel--its bytes are unchanged. We only copied
                 // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline.
                 for (var x = BytesPerPixel; x < RawScanline.Length; x++)
-                    TargetBuffer[x + targetOffset] = (byte)((RawScanline[x] - RawScanline[x - BytesPerPixel]) % 256);
+                    TargetBuffer[x + targetOffset] = (byte)(RawScanline[x] - RawScanline[x - BytesPerPixel]);
             }
         }
 
@@ -139,20 +139,19 @@ namespace Pingu.Benchmarks
 
             var chunks = (int)Math.Floor((double)(length - BytesPerPixel) / vecSize);
 
-            fixed (byte* raw = RawScanline) {
-                fixed (byte* target = TargetBuffer) {
-                    Buffer.MemoryCopy(raw, target + targetOffset, length, BytesPerPixel);
+            fixed (byte* raw = RawScanline)
+            fixed (byte* target = TargetBuffer) {
+                Buffer.MemoryCopy(raw, target + targetOffset, length, BytesPerPixel);
 
-                    for (int i = 0; i < chunks; i++) {
-                        int src = i * vecSize, dst = src + BytesPerPixel;
-                        var vec = new Vector<byte>(RawScanline, dst) - new Vector<byte>(RawScanline, src);
-                        vec.CopyTo(TargetBuffer, dst + targetOffset);
-                    }
-
-                    int start = BytesPerPixel + (vecSize * chunks) + targetOffset;
-                    for (int i = start; i < length; i++)
-                        target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel]));
+                for (int i = 0; i < chunks; i++) {
+                    int src = i * vecSize, dst = src + BytesPerPixel;
+                    var vec = new Vector<byte>(RawScanline, dst) - new Vector<byte>(RawScanline, src);
+                    vec.CopyTo(TargetBuffer, dst + targetOffset);
                 }
+
+                int start = BytesPerPixel + (vecSize * chunks) + targetOffset;
+                for (int i = start; i < length; i++)
+                    target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel]));
             }
         }
     }
