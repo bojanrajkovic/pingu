@@ -124,32 +124,35 @@ class Program
 
     static void TestSub()
     {
-        var sub = new SubImplementations { BytesPerPixel = 4, TotalBytes = 5000 };
-        byte[] naive = new byte[5000], pointer = new byte[5000], unrolled = new byte[5000],
-               preoffset = new byte[5000], vec = new byte[5000];
+        var sub = new SubImplementations { BytesPerPixel = 4, TotalBytes = 8 };
+        byte[] naive = new byte[sub.TotalBytes], pointer = new byte[sub.TotalBytes], unrolled = new byte[sub.TotalBytes],
+               preoffset = new byte[sub.TotalBytes], vec = new byte[sub.TotalBytes], motion = new byte[sub.TotalBytes];
 
         sub.Setup();
 
         sub.Naive();
-        Buffer.BlockCopy(sub.TargetBuffer, 0, naive, 0, 5000);
+        Buffer.BlockCopy(sub.TargetBuffer, 0, naive, 0, sub.TotalBytes);
 
         sub.Pointers();
-        Buffer.BlockCopy(sub.TargetBuffer, 0, pointer, 0, 5000);
+        Buffer.BlockCopy(sub.TargetBuffer, 0, pointer, 0, sub.TotalBytes);
 
         sub.PointersUnrolled();
-        Buffer.BlockCopy(sub.TargetBuffer, 0, unrolled, 0, 5000);
+        Buffer.BlockCopy(sub.TargetBuffer, 0, unrolled, 0, sub.TotalBytes);
 
         sub.PointersUnrolledPreOffset();
-        Buffer.BlockCopy(sub.TargetBuffer, 0, preoffset, 0, 5000);
+        Buffer.BlockCopy(sub.TargetBuffer, 0, preoffset, 0, sub.TotalBytes);
 
         sub.VectorAndPointer();
-        Buffer.BlockCopy(sub.TargetBuffer, 0, vec, 0, 5000);
+        Buffer.BlockCopy(sub.TargetBuffer, 0, vec, 0, sub.TotalBytes);
 
+        sub.PointersUnrolledPreOffsetMotion();
+        Buffer.BlockCopy(sub.TargetBuffer, 0, motion, 0, sub.TotalBytes);
 
         SequenceEqualSub(naive, pointer, sub.RawScanline);
         SequenceEqualSub(naive, unrolled, sub.RawScanline);
         SequenceEqualSub(naive, preoffset, sub.RawScanline);
         SequenceEqualSub(naive, vec, sub.RawScanline);
+        SequenceEqualSub(naive, motion, sub.RawScanline);
     }
 
     static void TestAdler()
@@ -181,10 +184,11 @@ class Program
             Console.WriteLine($"Sequences differ at index {i}, expected {expected[i]}, actual {actual[i]}");
             if (expected.Length < 99) {
                 Console.WriteLine("Printing data, then expected, then actual.");
-                Console.WriteLine(string.Join("-", Enumerable.Range(0, expected.Length).Select(x => x.ToString("00"))));
-                Console.WriteLine(BitConverter.ToString(data));
-                Console.WriteLine(BitConverter.ToString(expected));
-                Console.WriteLine(BitConverter.ToString(actual));
+                Console.WriteLine(string.Join("|", Enumerable.Range(0, expected.Length).Select(x => x.ToString("00"))));
+                Console.WriteLine(string.Join("|", Enumerable.Repeat("==", expected.Length)));
+                Console.WriteLine(BitConverter.ToString(data).Replace("-","|"));
+                Console.WriteLine(BitConverter.ToString(expected).Replace("-", "|"));
+                Console.WriteLine(BitConverter.ToString(actual).Replace("-", "|"));
             }
         } else {
             Console.WriteLine("Sequences are equal, press any key to proceed.");
