@@ -67,29 +67,33 @@ class Program
     static void TestUp()
     {
         var up = new UpImplementations { TotalBytes = 5000 };
-        byte[] naive = new byte[5000], ptr = new byte[5000], unr = new byte[5000], vec = new byte[5000],
-               unro = new byte[5000];
+        byte[] naive = new byte[up.TotalBytes], ptr = new byte[up.TotalBytes], unr = new byte[up.TotalBytes], 
+               vec = new byte[up.TotalBytes], unro = new byte[up.TotalBytes], motion = new byte[up.TotalBytes];
 
         up.Setup();
 
         up.Naive();
-        Buffer.BlockCopy(up.TargetBuffer, 0, naive, 0, 5000);
+        Buffer.BlockCopy(up.TargetBuffer, 0, naive, 0, up.TotalBytes);
 
         up.Pointers();
-        Buffer.BlockCopy(up.TargetBuffer, 0, ptr, 0, 5000);
+        Buffer.BlockCopy(up.TargetBuffer, 0, ptr, 0, up.TotalBytes);
 
         up.PointersUnrolled();
-        Buffer.BlockCopy(up.TargetBuffer, 0, unr, 0, 5000);
+        Buffer.BlockCopy(up.TargetBuffer, 0, unr, 0, up.TotalBytes);
 
         up.PointersUnrolledPreOffset();
-        Buffer.BlockCopy(up.TargetBuffer, 0, unro, 0, 5000);
+        Buffer.BlockCopy(up.TargetBuffer, 0, unro, 0, up.TotalBytes);
+
+        up.PointersUnrolledPreOffsetMotion();
+        Buffer.BlockCopy(up.TargetBuffer, 0, motion, 0, up.TotalBytes);
 
         up.VectorAndPointer();
-        Buffer.BlockCopy(up.TargetBuffer, 0, vec, 0, 5000);
+        Buffer.BlockCopy(up.TargetBuffer, 0, vec, 0, up.TotalBytes);
 
         SequenceEqualUp(naive, ptr, up.RawScanline, up.PreviousScanline);
         SequenceEqualUp(naive, unr, up.RawScanline, up.PreviousScanline);
         SequenceEqualUp(naive, unro, up.RawScanline, up.PreviousScanline);
+        SequenceEqualUp(naive, motion, up.RawScanline, up.PreviousScanline);
         SequenceEqualUp(naive, vec, up.RawScanline, up.PreviousScanline);
     }
 

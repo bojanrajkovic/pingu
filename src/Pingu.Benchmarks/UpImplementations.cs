@@ -40,7 +40,7 @@ namespace Pingu.Benchmarks
             int targetOffset = 0;
 
             for (var i = 0; i < RawScanline.Length; i++)
-                TargetBuffer[i + targetOffset] = (byte)((RawScanline[i] - PreviousScanline[i]) % 256);
+                TargetBuffer[i + targetOffset] = (byte)(RawScanline[i] - PreviousScanline[i]);
         }
 
         [Benchmark]
@@ -52,7 +52,7 @@ namespace Pingu.Benchmarks
             fixed (byte* previous = PreviousScanline)
             fixed (byte* target = TargetBuffer) {
                 for (var i = 0; i < RawScanline.Length; i++)
-                    target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
+                    target[i + targetOffset] = (byte)(raw[i] - previous[i]);
             }
         }
 
@@ -66,18 +66,18 @@ namespace Pingu.Benchmarks
             fixed (byte* target = TargetBuffer) {
                 int i = 0;
                 for (; RawScanline.Length - i > 8; i += 8) {
-                    target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
-                    target[i + 1 + targetOffset] = (byte)((raw[i + 1] - previous[i + 1]) % 256);
-                    target[i + 2 + targetOffset] = (byte)((raw[i + 2] - previous[i + 2]) % 256);
-                    target[i + 3 + targetOffset] = (byte)((raw[i + 3] - previous[i + 3]) % 256);
-                    target[i + 4 + targetOffset] = (byte)((raw[i + 4] - previous[i + 4]) % 256);
-                    target[i + 5 + targetOffset] = (byte)((raw[i + 5] - previous[i + 5]) % 256);
-                    target[i + 6 + targetOffset] = (byte)((raw[i + 6] - previous[i + 6]) % 256);
-                    target[i + 7 + targetOffset] = (byte)((raw[i + 7] - previous[i + 7]) % 256);
+                    target[i + targetOffset] = (byte)(raw[i] - previous[i]);
+                    target[i + 1 + targetOffset] = (byte)(raw[i + 1] - previous[i + 1]);
+                    target[i + 2 + targetOffset] = (byte)(raw[i + 2] - previous[i + 2]);
+                    target[i + 3 + targetOffset] = (byte)(raw[i + 3] - previous[i + 3]);
+                    target[i + 4 + targetOffset] = (byte)(raw[i + 4] - previous[i + 4]);
+                    target[i + 5 + targetOffset] = (byte)(raw[i + 5] - previous[i + 5]);
+                    target[i + 6 + targetOffset] = (byte)(raw[i + 6] - previous[i + 6]);
+                    target[i + 7 + targetOffset] = (byte)(raw[i + 7] - previous[i + 7]);
                 }
 
                 for (; i < RawScanline.Length; i++)
-                    target[i + targetOffset] = (byte)((raw[i] - previous[i]) % 256);
+                    target[i + targetOffset] = (byte)(raw[i] - previous[i]);
             }
         }
 
@@ -92,18 +92,48 @@ namespace Pingu.Benchmarks
                 byte* target = targetUnoffset + targetOffset;
                 int i = 0;
                 for (; RawScanline.Length - i > 8; i += 8) {
-                    target[i] = (byte)((raw[i] - previous[i]) % 256);
-                    target[i + 1] = (byte)((raw[i + 1] - previous[i + 1]) % 256);
-                    target[i + 2] = (byte)((raw[i + 2] - previous[i + 2]) % 256);
-                    target[i + 3] = (byte)((raw[i + 3] - previous[i + 3]) % 256);
-                    target[i + 4] = (byte)((raw[i + 4] - previous[i + 4]) % 256);
-                    target[i + 5] = (byte)((raw[i + 5] - previous[i + 5]) % 256);
-                    target[i + 6] = (byte)((raw[i + 6] - previous[i + 6]) % 256);
-                    target[i + 7] = (byte)((raw[i + 7] - previous[i + 7]) % 256);
+                    target[i] = (byte)(raw[i] - previous[i]);
+                    target[i + 1] = (byte)(raw[i + 1] - previous[i + 1]);
+                    target[i + 2] = (byte)(raw[i + 2] - previous[i + 2]);
+                    target[i + 3] = (byte)(raw[i + 3] - previous[i + 3]);
+                    target[i + 4] = (byte)(raw[i + 4] - previous[i + 4]);
+                    target[i + 5] = (byte)(raw[i + 5] - previous[i + 5]);
+                    target[i + 6] = (byte)(raw[i + 6] - previous[i + 6]);
+                    target[i + 7] = (byte)(raw[i + 7] - previous[i + 7]);
                 }
 
                 for (; i < RawScanline.Length; i++)
-                    target[i] = (byte)((raw[i] - previous[i]) % 256);
+                    target[i] = (byte)(raw[i] - previous[i]);
+            }
+        }
+
+        [Benchmark]
+        public unsafe void PointersUnrolledPreOffsetMotion()
+        {
+            int targetOffset = 0;
+
+            fixed (byte* raw = RawScanline)
+            fixed (byte* previous = PreviousScanline)
+            fixed (byte* targetUnoffset = TargetBuffer) {
+                byte* target = targetUnoffset + targetOffset, rawm = raw, prev = previous;
+                int i = 0;
+
+                for (; RawScanline.Length - i > 8; i += 8) {
+                    target[0] = (byte)(rawm[0] - prev[0]);
+                    target[1] = (byte)(rawm[1] - prev[1]);
+                    target[2] = (byte)(rawm[2] - prev[2]);
+                    target[3] = (byte)(rawm[3] - prev[3]);
+                    target[4] = (byte)(rawm[4] - prev[4]);
+                    target[5] = (byte)(rawm[5] - prev[5]);
+                    target[6] = (byte)(rawm[6] - prev[6]);
+                    target[7] = (byte)(rawm[7] - prev[7]);
+                    target += 8; rawm += 8; prev += 8;
+                }
+
+                for (; i < RawScanline.Length; i++) {
+                    target[0] = (byte)(rawm[0] - prev[0]);
+                    target++; rawm++; prev++;
+                }
             }
         }
 
