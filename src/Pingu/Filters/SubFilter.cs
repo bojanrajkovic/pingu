@@ -33,18 +33,18 @@ namespace Pingu.Filters
                     // the loop a bit, as well.
                     int x = bytesPerPixel;
                     for (; rawScanline.Length - x > 8; x += 8) {
-                        target[x] = (byte)((raw[x] - raw[x - bytesPerPixel]) % 256);
-                        target[x + 1] = (byte)((raw[x + 1] - raw[x + 1 - bytesPerPixel]) % 256);
-                        target[x + 2] = (byte)((raw[x + 2] - raw[x + 2 - bytesPerPixel]) % 256);
-                        target[x + 3] = (byte)((raw[x + 3] - raw[x + 3 - bytesPerPixel]) % 256);
-                        target[x + 4] = (byte)((raw[x + 4] - raw[x + 4 - bytesPerPixel]) % 256);
-                        target[x + 5] = (byte)((raw[x + 5] - raw[x + 5 - bytesPerPixel]) % 256);
-                        target[x + 6] = (byte)((raw[x + 6] - raw[x + 6 - bytesPerPixel]) % 256);
-                        target[x + 7] = (byte)((raw[x + 7] - raw[x + 7 - bytesPerPixel]) % 256);
+                        target[x] = (byte)(raw[x] - raw[x - bytesPerPixel]);
+                        target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - bytesPerPixel]);
+                        target[x + 2] = (byte)(raw[x + 2] - raw[x + 2 - bytesPerPixel]);
+                        target[x + 3] = (byte)(raw[x + 3] - raw[x + 3 - bytesPerPixel]);
+                        target[x + 4] = (byte)(raw[x + 4] - raw[x + 4 - bytesPerPixel]);
+                        target[x + 5] = (byte)(raw[x + 5] - raw[x + 5 - bytesPerPixel]);
+                        target[x + 6] = (byte)(raw[x + 6] - raw[x + 6 - bytesPerPixel]);
+                        target[x + 7] = (byte)(raw[x + 7] - raw[x + 7 - bytesPerPixel]);
                     }
 
                     for (; x < rawScanline.Length; x++)
-                        target[x] = (byte)((raw[x] - raw[x - bytesPerPixel]) % 256);
+                        target[x] = (byte)(raw[x] - raw[x - bytesPerPixel]);
                 }
             }
         }
