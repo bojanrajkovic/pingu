@@ -16,6 +16,7 @@ namespace Pingu.Tests
         [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Sub)]
         [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Up)]
         [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Average)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Paeth)]
         [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Dynamic)]
         public async Task Can_write_PNG_file(string imageName, FilterType type)
         {
