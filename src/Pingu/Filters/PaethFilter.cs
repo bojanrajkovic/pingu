@@ -47,24 +47,32 @@ namespace Pingu.Filters
                 } else {
                     int i = 0;
                     unchecked {
+                        byte* tgt = target, rawm = raw, prev = previous,
+                              rawBpp = raw - bytesPerPixel, prevBpp = previous - bytesPerPixel;
+
                         // The first bpp bytes, Paeth = Up
-                        for (; i < bytesPerPixel; i++)
-                            target[i] = (byte)(raw[i] - previous[i]);
+                        for (; i < bytesPerPixel; i++) {
+                            tgt[0] = (byte)(rawm[0] - prev[0]);
+                            tgt++; rawm++; prev++; rawBpp++; prevBpp++;
+                        }
 
                         // The remaining bytes, a and c have values!
                         for (; rawScanline.Length - i > 8; i += 8) {
-                            target[i] = (byte)(raw[i] - PaethFastAbs(raw[i - bytesPerPixel], previous[i], previous[i - bytesPerPixel]));
-                            target[i + 1] = (byte)(raw[i + 1] - PaethFastAbs(raw[i + 1 - bytesPerPixel], previous[i + 1], previous[i + 1 - bytesPerPixel]));
-                            target[i + 2] = (byte)(raw[i + 2] - PaethFastAbs(raw[i + 2 - bytesPerPixel], previous[i + 2], previous[i + 2 - bytesPerPixel]));
-                            target[i + 3] = (byte)(raw[i + 3] - PaethFastAbs(raw[i + 3 - bytesPerPixel], previous[i + 3], previous[i + 3 - bytesPerPixel]));
-                            target[i + 4] = (byte)(raw[i + 4] - PaethFastAbs(raw[i + 4 - bytesPerPixel], previous[i + 4], previous[i + 4 - bytesPerPixel]));
-                            target[i + 5] = (byte)(raw[i + 5] - PaethFastAbs(raw[i + 5 - bytesPerPixel], previous[i + 5], previous[i + 5 - bytesPerPixel]));
-                            target[i + 6] = (byte)(raw[i + 6] - PaethFastAbs(raw[i + 6 - bytesPerPixel], previous[i + 6], previous[i + 6 - bytesPerPixel]));
-                            target[i + 7] = (byte)(raw[i + 7] - PaethFastAbs(raw[i + 7 - bytesPerPixel], previous[i + 7], previous[i + 7 - bytesPerPixel]));
+                            tgt[0] = (byte)(rawm[0] - PaethFastAbs(rawBpp[0], prev[0], prevBpp[0]));
+                            tgt[1] = (byte)(rawm[1] - PaethFastAbs(rawBpp[1], prev[1], prevBpp[1]));
+                            tgt[2] = (byte)(rawm[2] - PaethFastAbs(rawBpp[2], prev[2], prevBpp[2]));
+                            tgt[3] = (byte)(rawm[3] - PaethFastAbs(rawBpp[3], prev[3], prevBpp[3]));
+                            tgt[4] = (byte)(rawm[4] - PaethFastAbs(rawBpp[4], prev[4], prevBpp[4]));
+                            tgt[5] = (byte)(rawm[5] - PaethFastAbs(rawBpp[5], prev[5], prevBpp[5]));
+                            tgt[6] = (byte)(rawm[6] - PaethFastAbs(rawBpp[6], prev[6], prevBpp[6]));
+                            tgt[7] = (byte)(rawm[7] - PaethFastAbs(rawBpp[7], prev[7], prevBpp[7]));
+                            tgt += 8; rawm += 8; prev += 8; rawBpp += 8; prevBpp += 8;
                         }
 
-                        for (; i < rawScanline.Length; i++)
-                            target[i] = (byte)(raw[i] - PaethFastAbs(raw[i - bytesPerPixel], previous[i], previous[i - bytesPerPixel]));
+                        for (; i < rawScanline.Length; i++) {
+                            tgt[0] = (byte)(rawm[0] - PaethFastAbs(rawBpp[0], prev[0], prevBpp[0]));
+                            tgt++; rawm++; prev++; rawBpp++; prevBpp++;
+                        }
                     }
                 }
             }

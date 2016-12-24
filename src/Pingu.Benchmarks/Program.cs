@@ -30,7 +30,8 @@ class Program
         var paeth = new PaethImplementations { TotalBytes = 5000, HasPreviousScanline = true, BytesPerPixel = 4 };
         byte[] naiveMath = new byte[paeth.TotalBytes], naiveFast = new byte[paeth.TotalBytes],
                naiveVec = new byte[paeth.TotalBytes], unrolledMath = new byte[paeth.TotalBytes],
-               unrolledFast = new byte[paeth.TotalBytes], unrolledVec = new byte[paeth.TotalBytes];
+               unrolledFast = new byte[paeth.TotalBytes], unrolledVec = new byte[paeth.TotalBytes],
+               unrolledMotion = new byte[paeth.TotalBytes];
 
         paeth.Setup();
 
@@ -52,11 +53,15 @@ class Program
         paeth.UnrolledWithVecAbs();
         Buffer.BlockCopy(paeth.TargetBuffer, 0, unrolledVec, 0, paeth.TotalBytes);
 
+        paeth.UnrolledWithFastAbsAndMovingPointers();
+        Buffer.BlockCopy(paeth.TargetBuffer, 0, unrolledMotion, 0, paeth.TotalBytes);
+
         SequenceEqualUp(naiveMath, naiveFast, paeth.RawScanline, paeth.PreviousScanline);
         SequenceEqualUp(naiveMath, naiveVec, paeth.RawScanline, paeth.PreviousScanline);
         SequenceEqualUp(naiveMath, unrolledMath, paeth.RawScanline, paeth.PreviousScanline);
         SequenceEqualUp(naiveMath, unrolledFast, paeth.RawScanline, paeth.PreviousScanline);
         SequenceEqualUp(naiveMath, unrolledVec, paeth.RawScanline, paeth.PreviousScanline);
+        SequenceEqualUp(naiveMath, unrolledMotion, paeth.RawScanline, paeth.PreviousScanline);
     }
 
     static void TestUp()
