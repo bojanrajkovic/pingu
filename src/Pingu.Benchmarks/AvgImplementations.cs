@@ -1,7 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.Numerics;
 using System.Security.Cryptography;
+
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Attributes.Jobs;

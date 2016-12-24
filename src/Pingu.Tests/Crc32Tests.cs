@@ -1,11 +1,10 @@
 ﻿using System;
+using System.IO.Compression;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 using Xunit;
-
-using Pingu.Checksums;
 
 namespace Pingu.Tests
 {
@@ -28,8 +27,8 @@ namespace Pingu.Tests
         public void Test_CRC32_Computation(byte[] input, uint expected)
         {
             unchecked {
-                var actual = Crc32.Compute(input);
-                Assert.Equal((int)expected, actual);
+                var actual = Crc32Helper.UpdateCrc32(0, input, 0, input.Length);
+                Assert.Equal(expected, actual);
             }
         }
     }

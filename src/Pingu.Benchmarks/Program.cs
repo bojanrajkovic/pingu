@@ -9,12 +9,14 @@ class Program
     static void Main(string[] args)
     {
         // TestAdler ();
+        // TestCrc32();
         // TestSub();
         // TestUp();
         // TestAvg();
         // TestPaeth();
 
         var switcher = new BenchmarkSwitcher(new[] {
+            typeof (Crc32Implementations),
             typeof (Adler32Implementations),
             typeof (SubImplementations),
             typeof (UpImplementations),
@@ -161,6 +163,17 @@ class Program
         SequenceEqualSub(naive, preoffset, sub.RawScanline);
         SequenceEqualSub(naive, vec, sub.RawScanline);
         SequenceEqualSub(naive, motion, sub.RawScanline);
+    }
+
+    static void TestCrc32()
+    {
+        var crc32 = new Crc32Implementations() { TotalBytes = 5000 };
+        crc32.Setup();
+
+        var ours = (uint)crc32.MyCRC32();
+        var corefx = crc32.CoreFxCRC32();
+
+        Console.WriteLine($"Ours: {ours} - CoreFX: {corefx}");
     }
 
     static void TestAdler()
