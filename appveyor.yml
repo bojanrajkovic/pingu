@@ -2,15 +2,22 @@ os: Visual Studio 2015
 environment:
   DOTNET_SDK_BINARIES_DOWNLOAD: "https://download.microsoft.com/download/7/E/8/7E8BD9BD-2892-4848-BA01-76493DECC138/dotnet-dev-win-x64.1.0.0-preview4-004233.zip"
 install:
-  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
-  - ps: if (Test-Path $env:DOTNET_INSTALL_DIR) { Remove-Item $env:DOTNET_INSTALL_DIR -Recurse }
-  - ps: $tempFile = [System.IO.Path]::GetTempFileName()
-  - ps: (New-Object System.Net.WebClient).DownloadFile($env:DOTNET_SDK_BINARIES_DOWNLOAD, $tempFile)
-  - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:DOTNET_INSTALL_DIR)
-  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk-preview4"
+  - ps: |
+      if (!(Test-Path $env:DOTNET_INSTALL_DIR)) {
+        $tempFile = [System.IO.Path]::GetTempFileName()
+        (New-Object System.Net.WebClient).DownloadFile($env:DOTNET_SDK_BINARIES_DOWNLOAD, $tempFile)
+        Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:DOTNET_INSTALL_DIR)
+        $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+      }
 before_build:
   - ps: dotnet --info
+  - ps: Push-Location .\src\Pingu
   - ps: dotnet restore
+  - ps: Pop-Location
+  - ps: Push-Location .\src\Pingu.Tests
+  - ps: dotnet restore
+  - ps: Pop-Location
 build_script:
   - ps: Push-Location .\src\Pingu
   - ps: dotnet build /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
