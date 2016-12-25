@@ -20,7 +20,7 @@ before_build:
   - ps: Pop-Location
 build_script:
   - ps: Push-Location .\src\Pingu
-  - ps: dotnet build /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - ps: dotnet build
   - ps: Pop-Location
 test_script:
   - ps: Push-Location .\src\Pingu.Tests
