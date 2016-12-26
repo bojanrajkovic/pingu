@@ -12,6 +12,10 @@
     <PackageProjectUrl>https://github.com/bojanrajkovic/Pingu</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.github.com/bojanrajkovic/Pingu/master/LICENSE.md</PackageLicenseUrl>
     <PackageTags>png</PackageTags>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
