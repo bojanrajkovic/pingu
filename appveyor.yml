@@ -4,17 +4,21 @@ environment:
   DOTNET_SDK_BINARIES_DOWNLOAD: "https://download.microsoft.com/download/7/E/8/7E8BD9BD-2892-4848-BA01-76493DECC138/dotnet-dev-win-x64.1.0.0-preview4-004233.zip"
   PINGU_ASSEMBLY_VERSION: 1.0.0
   PINGU_VERSION_FILE: Pingu.version
+  DOTNET_INSTALL_DIR: ".dotnetsdk-preview4"
 install:
-  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk-preview4"
   - ps: |
+      # Download .NET Core SDK Preview 4
       if (!(Test-Path $env:DOTNET_INSTALL_DIR)) {
         $tempFile = [System.IO.Path]::GetTempFileName()
         (New-Object System.Net.WebClient).DownloadFile($env:DOTNET_SDK_BINARIES_DOWNLOAD, $tempFile)
-        Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:DOTNET_INSTALL_DIR)
-        $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+        $targetPath = Join-Path $pwd $env:DOTNET_INSTALL_DIR
+        Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $targetPath)
+        $env:Path = "$targetPath;$env:Path"
         Remove-Item $tempFile
+        dotnet --info
       }
   - ps: |
+      # Compute version number
       $pinguVersion = Get-Content $env:PINGU_VERSION_FILE
       $lastVersionBump = $(git log -n 1 --format=format:%h $env:PINGU_VERSION_FILE)
       $commitsSinceLastVersionBump = $(git rev-list --count $lastVersionBump`.`.HEAD)
@@ -29,33 +33,54 @@ assembly_info:
   assembly_file_version: $(PINGU_VERSION)
   assembly_informational_version: $(PINGU_VERSION_AND_BRANCH)
 before_build:
-  - ps: dotnet --info
   - ps: |
+      # Prime .NET Core (unpack base reference assemblies)
       New-Item temp -Type Directory | Out-Null
       Push-Location temp
       dotnet new | Out-Null
       Pop-Location
       Remove-Item -Recurse temp
-  - ps: Push-Location .\src\Pingu
-  - ps: dotnet restore
-  - ps: Pop-Location
-  - ps: Push-Location .\src\Pingu.Tests
-  - ps: dotnet restore
-  - ps: Pop-Location
+  - ps: |
+      # Restore packages for Pingu
+      Push-Location .\src\Pingu
+      dotnet restore
+      Pop-Location
+  - ps: |
+      # Restore packages for Tests
+      Push-Location .\src\Pingu.Tests
+      dotnet restore
+      Pop-Location
 build_script:
-  - ps: Push-Location .\src\Pingu
-  - ps: dotnet build -c Release
-  - ps: Pop-Location
+  - ps: |
+      # Build Pingu
+      Push-Location .\src\Pingu
+      dotnet build -c Release
+      Pop-Location
+before_test:
+  - ps: |
+      # Install OpenCover and ReportGenerator for coverage
+      nuget install -OutputDirectory packages -Version 4.6.519 OpenCover
+      nuget install -OutputDirectory packages -Version 2.5.1 ReportGenerator
 test_script:
-  - ps: Push-Location .\src\Pingu.Tests
-  - ps: dotnet test -c Release
-  - ps: Pop-Location
+  - ps: |
+      # Run tests & coverage
+      $dotnetPath=(Join-Path $pwd (Join-Path $env:DOTNET_INSTALL_DIR dotnet.exe))
+      .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"$dotnetPath" `
+        -targetargs:"test src\Pingu.Tests\Pingu.Tests.csproj" -output:"coverage.xml" -oldstyle `
+        -filter:+[Pingu]*
 after_test:
   - ps: |
+      # Generate coverage report
+      .\packages\ReportGenerator.2.5.1\tools\ReportGenerator.exe -reports:coverage.xml -targetdir:coverage
+  - ps: |
+      # Build NuGet package
       if (($env:APPVEYOR_REPO_BRANCH -eq "master") -and ($env:APPVEYOR_PULL_REQUEST_TITLE -eq $null)) {
         Push-Location .\src\Pingu
         dotnet pack -c Release /p:Version=$env:PINGU_VERSION
       }
 artifacts:
   - path: '**\*.nupkg'
+  - path: coverage
+    name: Coverage Report
+    type: zip
 
