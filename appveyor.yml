@@ -19,12 +19,12 @@ install:
       if ($env:APPVEYOR_REPO_BRANCH -ne "master") { $branch = "-" + $env:APPVEYOR_REPO_BRANCH }
       $env:PINGU_VERSION="$pinguVersion.$commitsSinceLastVersionBump"
       $env:PINGU_VERSION_AND_BRANCH=$env:PINGU_VERSION + $branch
-      Update-AppveyorBuild -Version $env:PINGU_VERSION
+      Update-AppveyorBuild -Version $env:PINGU_VERSION_AND_BRANCH
 assembly_info:
   patch: true
   file: AssemblyInfo.cs
   assembly_version: $(PINGU_ASSEMBLY_VERSION)
-  assembly_file_version: '{version}'
+  assembly_file_version: $(PINGU_VERSION)
   assembly_informational_version: $(PINGU_VERSION_AND_BRANCH)
 before_build:
   - ps: dotnet --info
@@ -36,9 +36,15 @@ before_build:
   - ps: Pop-Location
 build_script:
   - ps: Push-Location .\src\Pingu
-  - ps: dotnet build
+  - ps: dotnet build -c Release
   - ps: Pop-Location
 test_script:
   - ps: Push-Location .\src\Pingu.Tests
-  - ps: dotnet test
+  - ps: dotnet test -c Release
   - ps: Pop-Location
+before_package:
+  - ps: |
+      Push-Location .\src\Pingu
+      dotnet pack -c Release /p:Version=$env:PINGU_VERSION
+artifacts:
+  - path: src\Pingu\bin\Release\Pingu.$env:PINGU_VERSION.nupkg
