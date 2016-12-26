@@ -30,7 +30,7 @@ assembly_info:
 before_build:
   - ps: dotnet --info
   - ps: |
-      New-Item temp -Type Directory
+      New-Item temp -Type Directory | Out-Null
       Push-Location temp
       dotnet new | Out-Null
       Pop-Location
