@@ -51,7 +51,7 @@ test_script:
   - ps: Pop-Location
 after_test:
   - ps: |
-      if (($env:APPVEYOR_REPO_BRANCH -eq "master") -and ($env:APPVEYOR_PULL_REQUEST_TITLE -ne "")) {
+      if (($env:APPVEYOR_REPO_BRANCH -eq "master") -and ($env:APPVEYOR_PULL_REQUEST_TITLE -eq "")) {
         Push-Location .\src\Pingu
         dotnet pack -c Release /p:Version=$env:PINGU_VERSION
       }
