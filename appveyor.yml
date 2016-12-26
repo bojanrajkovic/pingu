@@ -15,7 +15,7 @@ install:
   - ps: |
       $pinguVersion = Get-Content $env:PINGU_VERSION_FILE
       $lastVersionBump = $(git log -n 1 --format=format:%h $env:PINGU_VERSION_FILE)
-      $commitsSinceLastVersionBump = $(git rev-list --count $lastVersionBump..HEAD)
+      $commitsSinceLastVersionBump = $(git rev-list --count $lastVersionBump`.`.HEAD)
       if ($env:APPVEYOR_REPO_BRANCH -ne "master") { $branch = "-" + $env:APPVEYOR_REPO_BRANCH }
       Update-AppveyorBuild -Version "$pinguVersion.$commitsSinceLastVersionBump$branch"
 before_build:
