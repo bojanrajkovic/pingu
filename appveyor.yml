@@ -42,7 +42,7 @@ test_script:
   - ps: Push-Location .\src\Pingu.Tests
   - ps: dotnet test -c Release
   - ps: Pop-Location
-before_package:
+after_test:
   - ps: |
       Push-Location .\src\Pingu
       dotnet pack -c Release /p:Version=$env:PINGU_VERSION
