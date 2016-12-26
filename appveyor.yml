@@ -17,7 +17,15 @@ install:
       $lastVersionBump = $(git log -n 1 --format=format:%h $env:PINGU_VERSION_FILE)
       $commitsSinceLastVersionBump = $(git rev-list --count $lastVersionBump`.`.HEAD)
       if ($env:APPVEYOR_REPO_BRANCH -ne "master") { $branch = "-" + $env:APPVEYOR_REPO_BRANCH }
-      Update-AppveyorBuild -Version "$pinguVersion.$commitsSinceLastVersionBump$branch"
+      $env:PINGU_VERSION="$pinguVersion.$commitsSinceLastVersionBump"
+      $env:PINGU_VERSION_AND_BRANCH=$env:PINGU_VERSION + $branch
+      Update-AppveyorBuild -Version $env:PINGU_VERSION
+assembly_info:
+  patch: true
+  file: AssemblyInfo.cs
+  assembly_version: $(PINGU_ASSEMBLY_VERSION)
+  assembly_file_version: '{version}'
+  assembly_informational_version: $(PINGU_VERSION_AND_BRANCH)
 before_build:
   - ps: dotnet --info
   - ps: Push-Location .\src\Pingu
