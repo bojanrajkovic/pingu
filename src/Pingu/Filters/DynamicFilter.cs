@@ -24,14 +24,20 @@ namespace Pingu.Filters
 
         unsafe int SumAbsoluteDifferences(byte[] bytes)
         {
-            fixed (byte* ptr = bytes) {
-                int sum = 0;
-                for (var i = 0; i < bytes.Length; i++) {
-                    var val = ptr[i];
-                    sum += val < 128 ? val : 256 - val;
+            int sum = 0, len = bytes.Length;
+            unchecked {
+                fixed (byte* ptr = bytes) {
+                    sbyte* sb = (sbyte*)ptr;
+                    for (; len >= 16; len -= 16, sb += 16)
+                        sum += PinguMath.Abs(sb[0])  + PinguMath.Abs(sb[1])  + PinguMath.Abs(sb[2])  + PinguMath.Abs(sb[3]) +
+                               PinguMath.Abs(sb[4])  + PinguMath.Abs(sb[5])  + PinguMath.Abs(sb[6])  + PinguMath.Abs(sb[7]) +
+                               PinguMath.Abs(sb[8])  + PinguMath.Abs(sb[9])  + PinguMath.Abs(sb[10]) + PinguMath.Abs(sb[11]) +
+                               PinguMath.Abs(sb[12]) + PinguMath.Abs(sb[13]) + PinguMath.Abs(sb[14]) + PinguMath.Abs(sb[15]);
+                    for (; len > 0; len--, sb++)
+                        sum += PinguMath.Abs(sb[0]);
                 }
-                return sum;
             }
+            return sum;
         }
 
         public void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
