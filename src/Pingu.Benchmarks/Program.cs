@@ -14,10 +14,12 @@ class Program
         // TestUp();
         // TestAvg();
         // TestPaeth();
+        // TestMinSad();
 
         var switcher = new BenchmarkSwitcher(new[] {
             typeof (Crc32Implementations),
             typeof (Adler32Implementations),
+            typeof (MinSadImplementations),
             typeof (SubImplementations),
             typeof (UpImplementations),
             typeof (AvgImplementations),
@@ -25,6 +27,15 @@ class Program
         });
 
         switcher.Run(args);
+    }
+
+    static void TestMinSad()
+    {
+        var minsad = new MinSadImplementations { TotalBytes = 27 };
+        minsad.Setup();
+
+        Console.WriteLine($"Normal: {minsad.ByteByByte()} - Signed: {minsad.SignedBytesByByteFastAbs()} - Unrolled 8: {minsad.SignedBytesUnrolledFastAbs8()}");
+        Console.WriteLine($"Unrolled 16: {minsad.SignedBytesUnrolledFastAbs16()}");
     }
 
     static void TestPaeth()

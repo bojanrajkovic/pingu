@@ -15,21 +15,12 @@ namespace Pingu.Filters
         public FilterType Type => FilterType.Paeth;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        int Abs(int value)
-        {
-            int temp = value >> 31;
-            value ^= temp;
-            value += temp & 1;
-            return value;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         byte PaethFastAbs(byte a, byte b, byte c)
         {
             int p = a + b - c,
-                pa = Abs(p - a),
-                pb = Abs(p - b),
-                pc = Abs(p - c);
+                pa = PinguMath.Abs(p - a),
+                pb = PinguMath.Abs(p - b),
+                pc = PinguMath.Abs(p - c);
 
             return pa <= pb && pa <= pc ? a : (pb <= pc ? b : c);
         }
