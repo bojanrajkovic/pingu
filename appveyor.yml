@@ -1,0 +1,61 @@
+os: Visual Studio 2015
+version: "{build}"
+environment:
+  DOTNET_SDK_BINARIES_DOWNLOAD: "https://download.microsoft.com/download/7/E/8/7E8BD9BD-2892-4848-BA01-76493DECC138/dotnet-dev-win-x64.1.0.0-preview4-004233.zip"
+  PINGU_ASSEMBLY_VERSION: 1.0.0
+  PINGU_VERSION_FILE: Pingu.version
+install:
+  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk-preview4"
+  - ps: |
+      if (!(Test-Path $env:DOTNET_INSTALL_DIR)) {
+        $tempFile = [System.IO.Path]::GetTempFileName()
+        (New-Object System.Net.WebClient).DownloadFile($env:DOTNET_SDK_BINARIES_DOWNLOAD, $tempFile)
+        Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:DOTNET_INSTALL_DIR)
+        $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+        Remove-Item $tempFile
+      }
+  - ps: |
+      $pinguVersion = Get-Content $env:PINGU_VERSION_FILE
+      $lastVersionBump = $(git log -n 1 --format=format:%h $env:PINGU_VERSION_FILE)
+      $commitsSinceLastVersionBump = $(git rev-list --count $lastVersionBump`.`.HEAD)
+      if ($env:APPVEYOR_REPO_BRANCH -ne "master") { $branch = "-" + $env:APPVEYOR_REPO_BRANCH }
+      $env:PINGU_VERSION="$pinguVersion.$commitsSinceLastVersionBump"
+      $env:PINGU_VERSION_AND_BRANCH=$env:PINGU_VERSION + " - Branch: $branch"
+      Write-Output ("Pingu version: " + $env:PINGU_VERSION)
+assembly_info:
+  patch: true
+  file: AssemblyInfo.cs
+  assembly_version: $(PINGU_ASSEMBLY_VERSION)
+  assembly_file_version: $(PINGU_VERSION)
+  assembly_informational_version: $(PINGU_VERSION_AND_BRANCH)
+before_build:
+  - ps: dotnet --info
+  - ps: |
+      New-Item temp -Type Directory | Out-Null
+      Push-Location temp
+      dotnet new | Out-Null
+      Pop-Location
+      Remove-Item -Recurse temp
+  - ps: Push-Location .\src\Pingu
+  - ps: dotnet restore
+  - ps: Pop-Location
+  - ps: Push-Location .\src\Pingu.Tests
+  - ps: dotnet restore
+  - ps: Pop-Location
+build_script:
+  - ps: Push-Location .\src\Pingu
+  - ps: dotnet build -c Release
+  - ps: Pop-Location
+test_script:
+  - ps: Push-Location .\src\Pingu.Tests
+  - ps: dotnet test -c Release
+  - ps: Pop-Location
+after_test:
+  - ps: |
+      if (($env:APPVEYOR_REPO_BRANCH -eq "master") -and ($env:APPVEYOR_PULL_REQUEST_TITLE -eq $null)) {
+        Push-Location .\src\Pingu
+        dotnet pack -c Release /p:Version=$env:PINGU_VERSION
+      }
+artifacts:
+  - path: '**\*.nupkg'
+

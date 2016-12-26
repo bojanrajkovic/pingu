@@ -2,9 +2,20 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
   <PropertyGroup Label="Configuration">
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+    <PackageId>Pingu</PackageId>
+    <Authors>Bojan Rajkovic</Authors>
+    <Title>Pingu</Title>
+    <Description>A small, fast, fully-managed PNG encoder.</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>$(ReleaseNotes)</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/bojanrajkovic/Pingu</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.github.com/bojanrajkovic/Pingu/master/LICENSE.md</PackageLicenseUrl>
+    <PackageTags>png</PackageTags>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
