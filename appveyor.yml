@@ -29,7 +29,12 @@ assembly_info:
   assembly_informational_version: $(PINGU_VERSION_AND_BRANCH)
 before_build:
   - ps: dotnet --info
-  - ps: dotnet run | Out-Null
+  - ps: |
+      New-Item temp -Type Directory
+      Push-Location temp
+      dotnet new | Out-Null
+      Pop-Location
+      Remove-Item -Recurse temp
   - ps: Push-Location .\src\Pingu
   - ps: dotnet restore
   - ps: Pop-Location
