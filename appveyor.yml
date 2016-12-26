@@ -1,5 +1,5 @@
 os: Visual Studio 2015
-version: {build}
+version: "{build}"
 environment:
   DOTNET_SDK_BINARIES_DOWNLOAD: "https://download.microsoft.com/download/7/E/8/7E8BD9BD-2892-4848-BA01-76493DECC138/dotnet-dev-win-x64.1.0.0-preview4-004233.zip"
   PINGU_ASSEMBLY_VERSION: 1.0.0
