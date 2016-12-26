@@ -47,4 +47,4 @@ before_package:
       Push-Location .\src\Pingu
       dotnet pack -c Release /p:Version=$env:PINGU_VERSION
 artifacts:
-  - path: src\Pingu\bin\Release\Pingu.$env:PINGU_VERSION.nupkg
+  - path: "src\\Pingu\\bin\\Release\\Pingu.$($env:PINGU_VERSION).nupkg"
