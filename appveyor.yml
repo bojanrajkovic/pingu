@@ -44,8 +44,10 @@ test_script:
   - ps: Pop-Location
 after_test:
   - ps: |
-      Push-Location .\src\Pingu
-      dotnet pack -c Release /p:Version=$env:PINGU_VERSION
+      if ($env:APPVEYOR_REPO_BRANCH -eq "master") {
+        Push-Location .\src\Pingu
+        dotnet pack -c Release /p:Version=$env:PINGU_VERSION
+      }
 artifacts:
   - path: '**\*.nupkg'
-  - path: '**\AssemblyInfo.cs'
+
