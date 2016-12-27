@@ -5,6 +5,8 @@ environment:
   PINGU_ASSEMBLY_VERSION: 1.0.0
   PINGU_VERSION_FILE: Pingu.version
   DOTNET_INSTALL_DIR: ".dotnetsdk-preview4"
+  COVERALLS_REPO_TOKEN:
+    secure: rXQYRJDH6xRwjKr+wood5fZ4VnA8MSej+rFO1j7+2rf2aJwTmwma9t+Xqwf/AoVZ
 install:
   - ps: |
       # Download .NET Core SDK Preview 4
@@ -61,6 +63,7 @@ before_test:
       # Install OpenCover and ReportGenerator for coverage
       nuget install -OutputDirectory packages -Version 4.6.519 OpenCover
       nuget install -OutputDirectory packages -Version 2.5.1 ReportGenerator
+      nuget install -OutputDirectory packages -Version 0.412.0 coveralls.net
 test_script:
   - ps: |
       # Run tests & coverage
@@ -73,13 +76,18 @@ after_test:
       # Generate coverage report
       .\packages\ReportGenerator.2.5.1\tools\ReportGenerator.exe -reports:coverage.xml -targetdir:coverage
   - ps: |
+      # Upload to Coveralls
+      .\packages\coveralls.net.0.412\tools\csmacnz.Coveralls.exe --opencover -i coverage.xml --repoToken $env:COVERALLS_REPO_TOKEN `
+        --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR `
+        --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_JOB_ID
+  - ps: |
       # Build NuGet package
       if (($env:APPVEYOR_REPO_BRANCH -eq "master") -and ($env:APPVEYOR_PULL_REQUEST_TITLE -eq $null)) {
         Push-Location .\src\Pingu
         dotnet pack -c Release /p:Version=$env:PINGU_VERSION
       }
 artifacts:
-  - path: '**\*.nupkg'
+  - path: 'src\**\*.nupkg'
   - path: coverage
     name: Coverage Report
     type: zip
