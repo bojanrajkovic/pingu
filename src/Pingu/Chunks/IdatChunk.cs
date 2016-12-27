@@ -36,6 +36,10 @@ namespace Pingu.Chunks
 
         protected override async Task<byte[]> GetChunkDataAsync() => await GetCompressedDataAsync();
 
+        // TODO: Break this up into several methods for different types of images. Palletized images
+        // require a slightly different process than truecolor, and grayscale and alpha require a yet
+        // again different process. Currently, this only handles truecolor images of 8/16 bit depth.
+
         public async Task<byte[]> GetCompressedDataAsync()
         {
             if (compressedData != null)
@@ -107,9 +111,9 @@ namespace Pingu.Chunks
         {
             switch (imageInfo.ColorType) {
                 case 2:
-                    return 3;
+                    return 3 * imageInfo.BytesPerChannel;
                 case 6:
-                    return 4;
+                    return 4 * imageInfo.BytesPerChannel;
                 default:
                     throw new Exception($"Don't know how to deal with color type {imageInfo.ColorType}.");
             }

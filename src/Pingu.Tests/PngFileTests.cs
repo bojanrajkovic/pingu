@@ -12,13 +12,19 @@ namespace Pingu.Tests
     public class PngFileTests
     {
         [Theory]
-        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.None)]
-        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Sub)]
-        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Up)]
-        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Average)]
-        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Paeth)]
-        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Dynamic)]
-        public async Task Can_write_PNG_file(string imageName, FilterType type)
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.None, 8)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Sub, 8)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Up, 8)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Average, 8)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Paeth, 8)]
+        [InlineData("Pingu.Tests.Zooey.RGBA32", FilterType.Dynamic, 8)]
+        [InlineData("Pingu.Tests.Zooey.RGBA64", FilterType.None, 16)]
+        [InlineData("Pingu.Tests.Zooey.RGBA64", FilterType.Sub, 16)]
+        [InlineData("Pingu.Tests.Zooey.RGBA64", FilterType.Up, 16)]
+        [InlineData("Pingu.Tests.Zooey.RGBA64", FilterType.Average, 16)]
+        [InlineData("Pingu.Tests.Zooey.RGBA64", FilterType.Paeth, 16)]
+        [InlineData("Pingu.Tests.Zooey.RGBA64", FilterType.Dynamic, 16)]
+        public async Task Can_write_PNG_file(string imageName, FilterType type, int bitDepth)
         {
             var asm = typeof(PngFileTests).GetTypeInfo().Assembly;
             var resource = asm.GetManifestResourceStream(imageName);
@@ -30,7 +36,7 @@ namespace Pingu.Tests
                 rawRgbaData = ms.ToArray();
             }
 
-            var header = new IhdrChunk(752, 1334, 8);
+            var header = new IhdrChunk(752, 1334, bitDepth);
             var idat = new IdatChunk(header, rawRgbaData, type);
             var end = new IendChunk();
 
@@ -40,7 +46,7 @@ namespace Pingu.Tests
                 end
             };
 
-            var path = Path.Combine(Path.GetDirectoryName(asm.Location), $"Zooey-{type}.png");
+            var path = Path.Combine(Path.GetDirectoryName(asm.Location), $"Zooey-{bitDepth}-{type}.png");
             using (var fs = new FileStream(path, FileMode.Create))
                 await pngFile.WriteFileAsync(fs);
 
