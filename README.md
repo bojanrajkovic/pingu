@@ -2,6 +2,7 @@
 
 [![Join the chat at https://gitter.im/pingu-png/Lobby](https://badges.gitter.im/pingu-png/Lobby.svg)](https://gitter.im/pingu-png/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/i045feyyg0bkkvko/branch/master?svg=true)](https://ci.appveyor.com/project/bojanrajkovic/pingu/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/bojanrajkovic/pingu/badge.svg?branch=master)](https://coveralls.io/github/bojanrajkovic/pingu?branch=master)
 
 Pingu is a fully managed PNG encoder, written in C#.
 
