@@ -10,7 +10,9 @@ namespace Pingu.Chunks
 
         public int Width { get; }
         public int Height { get; }
-        public byte BitDepth { get; }
+        public int BitDepth { get; }
+
+        public int BytesPerChannel => BitDepth / 8;
 
         // ColorType 6 is true color, with alpha, in RGBA order. 2 is true color, w/o alpha, RGB order.
         public byte ColorType => 6;
@@ -26,7 +28,7 @@ namespace Pingu.Chunks
         public byte InterlaceMethod => 0;
 
         // Our IHDR chunk will only have 3 fungible values, the rest are going to be hard-coded.
-        public IhdrChunk(int width, int height, byte bitDepth)
+        public IhdrChunk(int width, int height, int bitDepth)
         {
             if (bitDepth != 8 && bitDepth != 16)
                 throw new ArgumentOutOfRangeException(nameof(bitDepth), "Bit depth must be 8 or 16 bits.");
@@ -50,7 +52,7 @@ namespace Pingu.Chunks
 
             Buffer.BlockCopy(widthBytes, 0, chunkData, 0, widthBytes.Length);
             Buffer.BlockCopy(heightBytes, 0, chunkData, 4, heightBytes.Length);
-            chunkData[8] = BitDepth;
+            chunkData[8] = (byte) BitDepth;
             chunkData[9] = ColorType;
             chunkData[10] = CompressionMethod;
             chunkData[11] = FilterMethod;

@@ -7,9 +7,8 @@
   <ItemGroup>
     <Compile Include="**\*.cs" />
     <EmbeddedResource Include="**\*.resx" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Zooey.RGBA32" />
+    <EmbeddedResource Include="Zooey.RGBA64" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.App">
@@ -31,8 +30,6 @@
     <PackageReference Include="xunit.runner.reporters">
       <Version>2.2.0-beta4-build3466</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Pingu\Pingu.csproj" />
   </ItemGroup>
   <ItemGroup />
