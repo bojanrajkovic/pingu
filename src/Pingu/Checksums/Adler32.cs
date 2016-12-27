@@ -32,11 +32,11 @@ namespace Pingu.Checksums
         // This implementation also approximates an unrolled 16-byte sum loop by defining a set of methods
         // like zlib's macros and asking the JIT to aggressively inline them. RyuJIT and Mono support this,
         // the legacy JIT I think does not.
-        public unsafe Adler32 FeedBlock(byte[] data)
+        public unsafe Adler32 FeedBlock(byte[] data, int offset, int length)
         {
             fixed (byte* ptr = data) {
-                byte* buf = ptr;
-                int length = data.Length, chunkSize;
+                byte* buf = ptr + offset;
+                int chunkSize;
                 while (length > 0) {
                     chunkSize = length < NMax ? length : NMax;
                     length -= chunkSize;
@@ -59,14 +59,20 @@ namespace Pingu.Checksums
             return this;
         }
 
+        public Adler32 FeedBlock(byte[] data) => FeedBlock(data, 0, data.Length);
+
         public static int Compute(byte[] data) => new Adler32().FeedBlock(data).Hash;
 
         public static async Task<int> ComputeAsync(Stream data)
         {
-            using (var ms = new MemoryStream()) {
-                await data.CopyToAsync(ms);
-                return Compute(ms.ToArray());
-            }
+            var adler = new Adler32();
+            int read;
+            byte[] buf = new byte[8192];
+
+            while ((read = await data.ReadAsync(buf, 0, buf.Length)) > 0)
+                adler.FeedBlock(buf, 0, read);
+
+            return adler.Hash;
         }
     }
 }

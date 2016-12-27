@@ -33,19 +33,11 @@ namespace Pingu.Tests
         }
 
         [Fact]
-        public void Can_compute_file_checksum()
+        public async Task Can_compute_file_checksum()
         {
             var asm = typeof(PngFileTests).GetTypeInfo().Assembly;
             var resource = asm.GetManifestResourceStream("Pingu.Tests.Zooey.RGBA32");
-
-            byte[] fileData;
-
-            using (var ms = new MemoryStream()) {
-                resource.CopyTo(ms);
-                fileData = ms.ToArray();
-            }
-
-            var checksum = Adler32.Compute(fileData);
+            var checksum = await Adler32.ComputeAsync(resource);
 
             Assert.Equal(unchecked((int) 0xf14287e8), checksum);
         }
