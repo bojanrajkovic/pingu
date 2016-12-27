@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 using Pingu.Checksums;
 
@@ -29,12 +32,41 @@ namespace Pingu.Tests
             yield return new object[] { ascii("\x43\x43\x43\x43\x43\x43\x43\x43\x43\x43\x43\x43\x43\x43\x43\x43"), 0x23a80431 };
         }
 
+        [Fact]
+        public void Can_compute_file_checksum()
+        {
+            var asm = typeof(PngFileTests).GetTypeInfo().Assembly;
+            var resource = asm.GetManifestResourceStream("Pingu.Tests.Zooey.RGBA32");
+
+            byte[] fileData;
+
+            using (var ms = new MemoryStream()) {
+                resource.CopyTo(ms);
+                fileData = ms.ToArray();
+            }
+
+            var checksum = Adler32.Compute(fileData);
+
+            Assert.Equal(unchecked((int) 0xf14287e8), checksum);
+        }
+
         [Theory]
         [MemberData (nameof (Adler32TestVectors))]
         public void Test_Adler32_computation(byte[] input, uint expected)
         {
             unchecked {
                 var actual = Adler32.Compute(input);
+                Assert.Equal((int)expected, actual);
+            }
+        }
+
+        [Theory]
+        [MemberData (nameof (Adler32TestVectors))]
+        public async Task Test_Adler32_stream_computation(byte[] input, uint expected)
+        {
+            unchecked {
+                var stream = new MemoryStream(input);
+                var actual = await Adler32.ComputeAsync(stream);
                 Assert.Equal((int)expected, actual);
             }
         }
