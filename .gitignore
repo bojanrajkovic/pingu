@@ -263,3 +263,7 @@ __pycache__/
 # BenchmarkDotNet
 BDN.Generated
 BenchmarkDotNet.Artifacts
+
+# OpenCover coverage XML + report
+/coverage.xml
+coverage
