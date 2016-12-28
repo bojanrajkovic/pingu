@@ -32,8 +32,8 @@ namespace Pingu.Tests
             var arex = Assert.Throws<ArgumentOutOfRangeException>(() => new IdatChunk(
                 new IhdrChunk(1, 1, 8, ColorType.Grayscale), 
                 new byte[0], 
-                (FilterType) (10))
-            );
+                (FilterType) (10)
+            ));
             Assert.Equal("filterType", arex.ParamName);
         }
 
@@ -56,6 +56,19 @@ namespace Pingu.Tests
         {
             var arex = Assert.Throws<ArgumentOutOfRangeException>(() => new IhdrChunk(1, 0, 8, ColorType.Grayscale));
             Assert.Equal("height", arex.ParamName);
+        }
+
+        [Theory]
+        [InlineData(ColorType.Grayscale)]
+        [InlineData(ColorType.GrayscaleAlpha)]
+        [InlineData(ColorType.Indexed)]
+        public void Idat_throws_for_unsupported_color_type(ColorType colorType)
+        {
+            var arex = Assert.Throws<ArgumentException>(() => new IdatChunk (
+                new IhdrChunk (1, 1, 8, colorType),
+                Array.Empty<byte>(),
+                FilterType.Dynamic
+            ));
         }
     }
 }
