@@ -1,5 +1,7 @@
 ﻿using System;
 
+using static Pingu.Math;
+
 namespace Pingu.Filters
 {
     class DynamicFilter : IFilter
@@ -28,12 +30,12 @@ namespace Pingu.Filters
                 fixed (byte* ptr = bytes) {
                     sbyte* sb = (sbyte*)ptr;
                     for (; len >= 16; len -= 16, sb += 16)
-                        sum += PinguMath.Abs(sb[0])  + PinguMath.Abs(sb[1])  + PinguMath.Abs(sb[2])  + PinguMath.Abs(sb[3]) +
-                               PinguMath.Abs(sb[4])  + PinguMath.Abs(sb[5])  + PinguMath.Abs(sb[6])  + PinguMath.Abs(sb[7]) +
-                               PinguMath.Abs(sb[8])  + PinguMath.Abs(sb[9])  + PinguMath.Abs(sb[10]) + PinguMath.Abs(sb[11]) +
-                               PinguMath.Abs(sb[12]) + PinguMath.Abs(sb[13]) + PinguMath.Abs(sb[14]) + PinguMath.Abs(sb[15]);
+                        sum += Abs(sb[0])  + Abs(sb[1])  + Abs(sb[2])  + Abs(sb[3]) +
+                               Abs(sb[4])  + Abs(sb[5])  + Abs(sb[6])  + Abs(sb[7]) +
+                               Abs(sb[8])  + Abs(sb[9])  + Abs(sb[10]) + Abs(sb[11]) +
+                               Abs(sb[12]) + Abs(sb[13]) + Abs(sb[14]) + Abs(sb[15]);
                     for (; len > 0; len--, sb++)
-                        sum += PinguMath.Abs(sb[0]);
+                        sum += Abs(sb[0]);
                 }
             }
             return sum;

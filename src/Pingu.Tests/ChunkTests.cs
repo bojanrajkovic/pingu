@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 
 using Pingu.Chunks;
+using Pingu.Colors;
 using Pingu.Filters;
 
 namespace Pingu.Tests

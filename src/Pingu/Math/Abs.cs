@@ -2,7 +2,7 @@
 
 namespace Pingu
 {
-    static class PinguMath
+    static partial class Math
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Abs(int value)

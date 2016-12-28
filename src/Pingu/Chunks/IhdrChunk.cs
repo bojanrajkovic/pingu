@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using Pingu.Colors;
+
 namespace Pingu.Chunks
 {
     public class IhdrChunk : Chunk
