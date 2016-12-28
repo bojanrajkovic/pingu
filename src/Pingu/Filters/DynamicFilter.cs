@@ -7,6 +7,7 @@ namespace Pingu.Filters
     class DynamicFilter : IFilter
     {
         static readonly IFilter[] PossibleFilters = new IFilter[] {
+            NullFilter.Instance,
             SubFilter.Instance,
             UpFilter.Instance,
             AvgFilter.Instance,
