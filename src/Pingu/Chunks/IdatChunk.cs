@@ -77,10 +77,6 @@ namespace Pingu.Chunks
             for (int i = 0; i < imageInfo.Height; i++) {
                 Buffer.BlockCopy(rawRgbData, i * scanline.Length, scanline, 0, scanline.Length);
 
-                // This is OK here, even for dynamic filtering. The dynamic filter will overwrite
-                // this with the chosen filter.
-                scanlineToWrite[0] = (byte)FilterType;
-
                 FilterInto(scanlineToWrite, 1, scanline, previousScanline, pixelWidth);
                 adler.FeedBlock(scanlineToWrite);
                 await deflateStream.WriteAsync(scanlineToWrite, 0, scanlineToWrite.Length);
@@ -109,8 +105,10 @@ namespace Pingu.Chunks
             int targetOffset,
             byte[] rawScanline,
             byte[] previousScanline,
-            int pixelWidth)
-            => DefaultFilters.GetFilterForType(FilterType)
-                             .FilterInto(scanlineToWrite, targetOffset, rawScanline, previousScanline, pixelWidth);
+            int pixelWidth) {
+                var filter = DefaultFilters.GetFilterForType(FilterType);
+                scanlineToWrite[targetOffset-1] = (byte)filter.Type;
+                filter.FilterInto(scanlineToWrite, targetOffset, rawScanline, previousScanline, pixelWidth);
+            }
     }
 }
