@@ -14,7 +14,7 @@ namespace Pingu.Filters
 
         public FilterType Type => FilterType.Up;
 
-        public unsafe void UnrolledPointerFilterInto(
+        internal unsafe void UnrolledPointerFilterInto(
             byte[] targetBuffer,
             int targetOffset,
             byte[] rawScanline,
@@ -45,7 +45,7 @@ namespace Pingu.Filters
             }
         }
 
-        public unsafe void VectorAndPointerFilterInto(
+        internal unsafe void VectorAndPointerFilterInto(
             byte[] targetBuffer,
             int targetOffset,
             byte[] rawScanline,
