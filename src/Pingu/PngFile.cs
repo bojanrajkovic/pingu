@@ -23,7 +23,7 @@ namespace Pingu
         public async Task WriteFileAsync(Stream target)
         {
             await target.WriteAsync(magic, 0, magic.Length);
-            foreach (var chunk in chunksToWrite)
+            foreach (var chunk in this)
                 await chunk.WriteSelfToStreamAsync(target);
         }
     }
