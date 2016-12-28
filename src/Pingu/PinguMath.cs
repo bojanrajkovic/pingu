@@ -7,10 +7,8 @@ namespace Pingu
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Abs(int value)
         {
-            int temp = value >> 31;
-            value ^= temp;
-            value += temp & 1;
-            return value;
+            int mask = value >> 31;
+            return (value ^ mask) - mask;
         }
     }
 }
