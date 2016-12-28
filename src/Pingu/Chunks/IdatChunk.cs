@@ -45,7 +45,8 @@ namespace Pingu.Chunks
             if (compressedData != null)
                 return compressedData;
 
-            int pixelWidth = GetPixelWidthForImage();
+            int pixelWidth = (imageInfo.ColorType == ColorType.Truecolor ? 3 : 4) *
+                             imageInfo.BitDepth/8;
 
             // Set up a couple of streams where we're going to hold our data.
             // We need a stream for the final data and a deflate wrapper over it
@@ -106,17 +107,5 @@ namespace Pingu.Chunks
             int pixelWidth)
             => DefaultFilters.GetFilterForType(FilterType)
                              .FilterInto(scanlineToWrite, targetOffset, rawScanline, previousScanline, pixelWidth);
-
-        int GetPixelWidthForImage()
-        {
-            switch (imageInfo.ColorType) {
-                case 2:
-                    return 3 * imageInfo.BytesPerChannel;
-                case 6:
-                    return 4 * imageInfo.BytesPerChannel;
-                default:
-                    throw new Exception($"Don't know how to deal with color type {imageInfo.ColorType}.");
-            }
-        }
     }
 }

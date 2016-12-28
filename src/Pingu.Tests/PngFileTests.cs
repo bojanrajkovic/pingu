@@ -36,7 +36,7 @@ namespace Pingu.Tests
                 rawRgbaData = ms.ToArray();
             }
 
-            var header = new IhdrChunk(752, 1334, bitDepth);
+            var header = new IhdrChunk(752, 1334, bitDepth, ColorType.TruecolorAlpha);
             var idat = new IdatChunk(header, rawRgbaData, type);
             var end = new IendChunk();
 
