@@ -33,11 +33,11 @@ namespace Pingu.Chunks
             if (bitDepth != 8 && bitDepth != 16)
                 throw new ArgumentOutOfRangeException(nameof(bitDepth), "Bit depth must be 8 or 16 bits.");
 
-            if (width <= 0)
-                throw new ArgumentOutOfRangeException(nameof(width), "Width must be > 0.");
+            if (width <= 0 || width > int.MaxValue)
+                throw new ArgumentOutOfRangeException(nameof(width), "Width must be within the range of 1 to 2^31-1.");
 
-            if (height <= 0)
-                throw new ArgumentOutOfRangeException(nameof(height), "Height must be > 0.");
+            if (height <= 0 || height > int.MaxValue)
+                throw new ArgumentOutOfRangeException(nameof(height), "Height must be within the range of 1 to 2^31-1.");
 
             Width = width;
             Height = height;
