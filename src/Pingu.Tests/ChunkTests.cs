@@ -71,5 +71,57 @@ namespace Pingu.Tests
                 FilterType.Dynamic
             ));
         }
+
+        [Fact]
+        public void Ihdr_throws_for_garbage_color_type()
+        {
+            var arex = Assert.Throws<ArgumentOutOfRangeException>(() => new IhdrChunk (
+                1,
+                1,
+                16,
+                (ColorType)10
+            ));
+            Assert.Equal("colorType", arex.ParamName);
+        }
+
+        [Theory]
+        [InlineData(ColorType.Indexed,        1,  false)]
+        [InlineData(ColorType.Indexed,        2,  false)]
+        [InlineData(ColorType.Indexed,        4,  false)]
+        [InlineData(ColorType.Indexed,        8,  false)]
+        [InlineData(ColorType.Indexed,        16, true)]
+        [InlineData(ColorType.Grayscale,      1,  false)]
+        [InlineData(ColorType.Grayscale,      2,  false)]
+        [InlineData(ColorType.Grayscale,      4,  false)]
+        [InlineData(ColorType.Grayscale,      8,  false)]
+        [InlineData(ColorType.Grayscale,      16, false)]
+        [InlineData(ColorType.GrayscaleAlpha, 1,  true)]
+        [InlineData(ColorType.GrayscaleAlpha, 2,  true)]
+        [InlineData(ColorType.GrayscaleAlpha, 4,  true)]
+        [InlineData(ColorType.GrayscaleAlpha, 8,  false)]
+        [InlineData(ColorType.GrayscaleAlpha, 16, false)]
+        [InlineData(ColorType.Truecolor,      1,  true)]
+        [InlineData(ColorType.Truecolor,      2,  true)]
+        [InlineData(ColorType.Truecolor,      4,  true)]
+        [InlineData(ColorType.Truecolor,      8,  false)]
+        [InlineData(ColorType.Truecolor,      16, false)]
+        [InlineData(ColorType.TruecolorAlpha, 1,  true)]
+        [InlineData(ColorType.TruecolorAlpha, 2,  true)]
+        [InlineData(ColorType.TruecolorAlpha, 4,  true)]
+        [InlineData(ColorType.TruecolorAlpha, 8,  false)]
+        [InlineData(ColorType.TruecolorAlpha, 16, false)]
+        public void Ihdr_accepts_valid_bit_depths_for_color_type(ColorType colorType, int bitDepth, bool throws)
+        {
+            if (throws) {
+                Assert.Throws<Exception>(() => new IhdrChunk (
+                    1,
+                    1,
+                    bitDepth,
+                    colorType
+                ));
+            } else {
+                var chunk = new IhdrChunk (1, 1, bitDepth, colorType);
+            }
+        }
     }
 }
