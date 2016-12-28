@@ -229,7 +229,7 @@ namespace Pingu.Benchmarks
                     Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
 
                     int vecSize = Vector<byte>.Count, length = TotalBytes;
-                    var chunks = (int)Math.Floor((double)(length - BytesPerPixel) / vecSize);
+                    var chunks = (int)((float)(length - BytesPerPixel) / vecSize);
                     var twos = new Vector<byte>(2);
 
                     for (int i = 0; i < chunks; i++) {

@@ -64,7 +64,7 @@ namespace Pingu.Filters
             int bytesPerPixel)
         {
             int vecSize = Vector<byte>.Count, length = scanline.Length;
-            var chunks = (int)Math.Floor((double)(length - bytesPerPixel) / vecSize);
+            var chunks = (int)((float)(length - bytesPerPixel) / vecSize);
 
             fixed (byte* dataPtr = scanline)
             fixed (byte* resultPtr = targetBuffer) {
