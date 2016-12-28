@@ -52,6 +52,7 @@ namespace Pingu.Tests
                 await pngFile.WriteFileAsync(fs);
 
             Assert.True(File.Exists(path));
+            Assert.Equal(3, pngFile.ChunkCount);
 
             var result = ToolHelper.RunPngCheck(path);
 
