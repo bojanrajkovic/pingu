@@ -31,10 +31,14 @@ namespace Pingu.Chunks
                     $"Filter type {filterType} is not defined."
                 );
 
+            if (imageInfo.ColorType != ColorType.Truecolor && imageInfo.ColorType != ColorType.TruecolorAlpha)
+                throw new ArgumentException("Pingu currently does not support anything other than " +
+                                            "truecolor (with optional alpha) images.");
+
             FilterType = filterType;
         }
 
-        protected override async Task<byte[]> GetChunkDataAsync() => await GetCompressedDataAsync();
+        protected override Task<byte[]> GetChunkDataAsync() => GetCompressedDataAsync();
 
         // TODO: Break this up into several methods for different types of images. Palletized images
         // require a slightly different process than truecolor, and grayscale and alpha require a yet
