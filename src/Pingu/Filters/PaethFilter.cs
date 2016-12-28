@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
+using static Pingu.Math;
+
 namespace Pingu.Filters
 {
     class PaethFilter : IFilter
@@ -18,9 +20,9 @@ namespace Pingu.Filters
         byte PaethFastAbs(byte a, byte b, byte c)
         {
             int pc = c, pa = b - pc, pb = a - pc;
-            pc = PinguMath.Abs(pa + pb);
-            pa = PinguMath.Abs(pa);
-            pb = PinguMath.Abs(pb);
+            pc = Abs(pa + pb);
+            pa = Abs(pa);
+            pb = Abs(pb);
 
             return pa <= pb && pa <= pc ? a : (pb <= pc ? b : c);
         }

@@ -1,4 +1,4 @@
-namespace Pingu
+namespace Pingu.Colors
 {
     public enum ColorType : byte
     {

@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 
 using Pingu.Checksums;
+using Pingu.Colors;
 using Pingu.Filters;
 
 namespace Pingu.Chunks
