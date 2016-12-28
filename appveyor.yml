@@ -70,7 +70,7 @@ test_script:
       $dotnetPath=(Join-Path $pwd (Join-Path $env:DOTNET_INSTALL_DIR dotnet.exe))
       .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"$dotnetPath" `
         -targetargs:"test src\Pingu.Tests\Pingu.Tests.csproj" -output:"coverage.xml" -oldstyle `
-        -filter:+[Pingu]*
+        -filter:+[Pingu]* -threshold:1
 after_test:
   - ps: |
       # Generate coverage report
