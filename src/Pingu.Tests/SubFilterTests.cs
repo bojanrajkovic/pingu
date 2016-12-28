@@ -33,11 +33,22 @@ namespace Pingu.Tests
 
         [Theory]
         [MemberData(nameof(SubFilterTestVectors))]
+        public void Can_filter_correctly_without_vectors(byte[] input, byte[] expected, int bytesPerPixel)
+        {
+            var filter = SubFilter.Instance;
+            var filteredScanline = new byte[expected.Length];
+            filter.UnrolledPointerFilterInto(filteredScanline, 0, input, null, bytesPerPixel);
+
+            Assert.Equal(expected, filteredScanline);
+        }
+
+        [Theory]
+        [MemberData(nameof(SubFilterTestVectors))]
         public void Can_filter_correctly(byte[] input, byte[] expected, int bytesPerPixel)
         {
             var filter = SubFilter.Instance;
             var filteredScanline = new byte[expected.Length];
-            filter.FilterInto(filteredScanline, 0, input, null, bytesPerPixel);
+            filter.VectorAndPointerFilterInto(filteredScanline, 0, input, null, bytesPerPixel);
 
             Assert.Equal(expected, filteredScanline);
         }
