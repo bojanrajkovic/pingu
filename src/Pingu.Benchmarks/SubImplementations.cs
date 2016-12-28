@@ -176,7 +176,7 @@ namespace Pingu.Benchmarks
             int vecSize = Vector<byte>.Count, length = RawScanline.Length;
             int targetOffset = 0;
 
-            var chunks = (int)Math.Floor((double)(length - BytesPerPixel) / vecSize);
+            var chunks = (int)((float)(length - BytesPerPixel) / vecSize);
 
             fixed (byte* raw = RawScanline)
             fixed (byte* target = TargetBuffer) {
