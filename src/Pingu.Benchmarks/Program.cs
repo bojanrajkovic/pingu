@@ -16,12 +16,14 @@ class Program
         // TestPaeth();
         // TestMinSad();
         // TestFloor();
+        // TestCeiling();
 
         var switcher = new BenchmarkSwitcher(new[] {
             typeof (Crc32Implementations),
             typeof (Adler32Implementations),
             typeof (MinSadImplementations),
             typeof (FloorImplementations),
+            typeof (CeilingImplementations),
             typeof (SubImplementations),
             typeof (UpImplementations),
             typeof (AvgImplementations),
@@ -29,6 +31,22 @@ class Program
         });
 
         switcher.Run(args);
+    }
+
+    static void TestCeiling()
+    {
+        var ceil = new CeilingImplementations { DoublesToCeil = 10 };
+        ceil.Setup();
+
+        int[] mathCeiling = new int[ceil.DoublesToCeil], fastCeiling = new int[ceil.DoublesToCeil];
+
+        ceil.MathCeil();
+        Array.Copy(ceil.CeilingedData, 0, mathCeiling, 0, ceil.DoublesToCeil);
+
+        ceil.FastCeil();
+        Array.Copy(ceil.CeilingedData, 0, fastCeiling, 0, ceil.DoublesToCeil);
+
+        SequenceEqual(mathCeiling, fastCeiling, ceil.CeilingData);
     }
 
     static void TestFloor()
@@ -39,12 +57,12 @@ class Program
         int[] mathFloor = new int[floor.FloatsToFloor], fastFloor = new int[floor.FloatsToFloor];
 
         floor.MathFloor();
-        Buffer.BlockCopy(floor.FlooredData, 0, mathFloor, 0, floor.FloatsToFloor);
+        Array.Copy(floor.FlooredData, 0, mathFloor, 0, floor.FloatsToFloor);
 
         floor.FastFloor();
-        Buffer.BlockCopy(floor.FlooredData, 0, fastFloor, 0, floor.FloatsToFloor);
+        Array.Copy(floor.FlooredData, 0, fastFloor, 0, floor.FloatsToFloor);
 
-        SequenceEqualFloor(mathFloor, fastFloor, floor.FloorData);
+        SequenceEqual(mathFloor, fastFloor, floor.FloorData);
     }
 
     static void TestMinSad()
@@ -226,7 +244,7 @@ class Program
         Console.WriteLine($"Smartest: {smartest} - Smarter: {smarter} - Known: {known}");
     }
 
-    static void SequenceEqualFloor(int[] expected, int[] actual, float[] data)
+    static void SequenceEqual<T>(int[] expected, int[] actual, T[] data)
     {
         int i = 0;
         bool equal = true;
@@ -240,7 +258,7 @@ class Program
 
         if (!equal) {
             Console.WriteLine("Sequences are not equal from test methods, please check implementation.");
-            Console.WriteLine($"Sequences differ at index {i}, expected {expected[i]}, actual {actual[i]}");
+            Console.WriteLine($"Sequences differ at index {i}, expected {expected[i]}, actual {actual[i]}, original: {data[i]}");
         } else {
             Console.WriteLine("Sequences are equal, press any key to proceed.");
         }
