@@ -20,14 +20,17 @@ namespace Pingu.Colors
             reversePallette = new Dictionary<int, int> (PalletteSize);
         }
 
-        internal int AddColorToPallette(byte r, byte g, byte b)
+        internal int AddColorToPallette(Color c) => AddPacked(c.Packed);
+
+        internal int AddColorToPallette(byte r, byte g, byte b) => AddPacked(ColorHelpers.PackRgb(r, g, b));
+
+        int AddPacked (int packedColor)
         {
             if (currentPalletteEntry == PalletteSize)
                 throw new Exception($"Pallette is at capacity, increase bit depth for the image.");
 
-            int color = ColorHelpers.PackRgb(r, g, b);
-            palletteEntries[currentPalletteEntry] = color;
-            reversePallette[color] = currentPalletteEntry;
+            palletteEntries[currentPalletteEntry] = packedColor;
+            reversePallette[packedColor] = currentPalletteEntry;
 
             return currentPalletteEntry++;
         }
