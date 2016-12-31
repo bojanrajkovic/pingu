@@ -362,6 +362,105 @@ namespace Pingu.Tests
         }
 
         [Fact]
+        public void Can_convert_two_bit_image_data_to_truecolor_8_image_data()
+        {
+            var pallette = new Pallette(2);
+            var transparencyMap = new TransparencyMap(2);
+
+            for (int i = 0; i < 4; i++) {
+                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
+                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
+            }
+
+            var imageData = new byte[] { 0b00011011, 0b11100100, 0b01000000 };
+            var indexedImageSource = new IndexedImageSource(2, imageData, 9, 1, pallette, transparencyMap);
+
+            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(8);
+            var colorData = truecolorImageSource.RawData;
+
+            // Should be 27 bytes -- 9 pixels @ 3 bytes per pixel.
+            var expectedData = new byte[] {
+                PalletteTestColors[0].R, PalletteTestColors[0].G, PalletteTestColors[0].B,
+                PalletteTestColors[1].R, PalletteTestColors[1].G, PalletteTestColors[1].B,
+                PalletteTestColors[2].R, PalletteTestColors[2].G, PalletteTestColors[2].B,
+                PalletteTestColors[3].R, PalletteTestColors[3].G, PalletteTestColors[3].B,
+                PalletteTestColors[3].R, PalletteTestColors[3].G, PalletteTestColors[3].B,
+                PalletteTestColors[2].R, PalletteTestColors[2].G, PalletteTestColors[2].B,
+                PalletteTestColors[1].R, PalletteTestColors[1].G, PalletteTestColors[1].B,
+                PalletteTestColors[0].R, PalletteTestColors[0].G, PalletteTestColors[0].B,
+                PalletteTestColors[1].R, PalletteTestColors[1].G, PalletteTestColors[1].B
+            };
+
+            Assert.Equal(expectedData, colorData);
+        }
+
+        [Fact]
+        public void Can_convert_four_bit_image_data_to_truecolor_8_image_data()
+        {
+            var pallette = new Pallette(4);
+            var transparencyMap = new TransparencyMap(4);
+
+            for (int i = 0; i < 16; i++) {
+                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
+                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
+            }
+
+            var imageData = new byte[] { 0b01011010, 0b11110001, 0b00000110, 0b00100100, 0b11000000 };
+            var indexedImageSource = new IndexedImageSource(4, imageData, 9, 1, pallette, transparencyMap);
+
+            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(8);
+            var colorData = truecolorImageSource.RawData;
+
+            // Should be 27 bytes -- 9 pixels @ 3 bytes per pixel.
+            var expectedData = new byte[] {
+                PalletteTestColors[5].R, PalletteTestColors[5].G, PalletteTestColors[5].B,
+                PalletteTestColors[10].R, PalletteTestColors[10].G, PalletteTestColors[10].B,
+                PalletteTestColors[15].R, PalletteTestColors[15].G, PalletteTestColors[15].B,
+                PalletteTestColors[1].R, PalletteTestColors[1].G, PalletteTestColors[1].B,
+                PalletteTestColors[0].R, PalletteTestColors[0].G, PalletteTestColors[0].B,
+                PalletteTestColors[6].R, PalletteTestColors[6].G, PalletteTestColors[6].B,
+                PalletteTestColors[2].R, PalletteTestColors[2].G, PalletteTestColors[2].B,
+                PalletteTestColors[4].R, PalletteTestColors[4].G, PalletteTestColors[4].B,
+                PalletteTestColors[12].R, PalletteTestColors[12].G, PalletteTestColors[12].B
+            };
+
+            Assert.Equal(expectedData, colorData);
+        }
+
+        [Fact]
+        public void Can_convert_eight_bit_image_data_to_truecolor_8_image_data()
+        {
+            var pallette = new Pallette(8);
+            var transparencyMap = new TransparencyMap(8);
+
+            for (int i = 0; i < 256; i++) {
+                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
+                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
+            }
+
+            var imageData = new byte[] { 13, 44, 97, 93, 11, 5, 8, 9, 239 };
+            var indexedImageSource = new IndexedImageSource(8, imageData, 9, 1, pallette, transparencyMap);
+
+            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(8);
+            var colorData = truecolorImageSource.RawData;
+
+            // Should be 27 bytes -- 9 pixels @ 3 bytes per pixel.
+            var expectedData = new byte[] {
+                PalletteTestColors[13].R, PalletteTestColors[13].G, PalletteTestColors[13].B,
+                PalletteTestColors[44].R, PalletteTestColors[44].G, PalletteTestColors[44].B,
+                PalletteTestColors[97].R, PalletteTestColors[97].G, PalletteTestColors[97].B,
+                PalletteTestColors[93].R, PalletteTestColors[93].G, PalletteTestColors[93].B,
+                PalletteTestColors[11].R, PalletteTestColors[11].G, PalletteTestColors[11].B,
+                PalletteTestColors[5].R, PalletteTestColors[5].G, PalletteTestColors[5].B,
+                PalletteTestColors[8].R, PalletteTestColors[8].G, PalletteTestColors[8].B,
+                PalletteTestColors[9].R, PalletteTestColors[9].G, PalletteTestColors[9].B,
+                PalletteTestColors[239].R, PalletteTestColors[239].G, PalletteTestColors[239].B
+            };
+
+            Assert.Equal(expectedData, colorData);
+        }
+
+        [Fact]
         public void Conversion_to_indexed_image_source_with_same_bit_depth_returns_same_instance()
         {
             var pallette = new Pallette(8);
