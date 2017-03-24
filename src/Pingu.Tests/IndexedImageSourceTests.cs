@@ -296,39 +296,6 @@ namespace Pingu.Tests
         }
 
         [Fact]
-        public void Can_convert_single_bit_image_data_to_truecolor_16_image_data()
-        {
-            var pallette = new Pallette(1);
-            var transparencyMap = new TransparencyMap(1);
-
-            for (int i = 0; i < 2; i++) {
-                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
-                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
-            }
-
-            var imageData = new byte[] { 0b11011000, 0b10000000 };
-            var indexedImageSource = new IndexedImageSource(1, imageData, 9, 1, pallette, transparencyMap);
-
-            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(16);
-            var colorData = truecolorImageSource.RawData;
-
-            // Should be 54 bytes -- 9 pixels @ 6 bytes per pixel.
-            var expectedData = new byte[] {
-                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
-                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
-                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
-                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
-                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
-                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
-                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
-                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
-                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B
-            };
-
-            Assert.Equal(expectedData, colorData);
-        }
-
-        [Fact]
         public void Can_convert_single_bit_image_data_to_truecolor_8_image_data()
         {
             var pallette = new Pallette(1);
@@ -455,6 +422,138 @@ namespace Pingu.Tests
                 PalletteTestColors[8].R, PalletteTestColors[8].G, PalletteTestColors[8].B,
                 PalletteTestColors[9].R, PalletteTestColors[9].G, PalletteTestColors[9].B,
                 PalletteTestColors[239].R, PalletteTestColors[239].G, PalletteTestColors[239].B
+            };
+
+            Assert.Equal(expectedData, colorData);
+        }
+
+        [Fact]
+        public void Can_convert_single_bit_image_data_to_truecolor_16_image_data()
+        {
+            var pallette = new Pallette(1);
+            var transparencyMap = new TransparencyMap(1);
+
+            for (int i = 0; i < 2; i++) {
+                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
+                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
+            }
+
+            var imageData = new byte[] { 0b11011000, 0b10000000 };
+            var indexedImageSource = new IndexedImageSource(1, imageData, 9, 1, pallette, transparencyMap);
+
+            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(16);
+            var colorData = truecolorImageSource.RawData;
+
+            // Should be 27 bytes -- 9 pixels @ 3 bytes per pixel.
+            var expectedData = new byte[] {
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
+                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
+                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
+                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
+                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B
+            };
+
+            Assert.Equal(expectedData, colorData);
+        }
+
+        [Fact]
+        public void Can_convert_two_bit_image_data_to_truecolor_16_image_data()
+        {
+            var pallette = new Pallette(2);
+            var transparencyMap = new TransparencyMap(2);
+
+            for (int i = 0; i < 4; i++) {
+                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
+                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
+            }
+
+            var imageData = new byte[] { 0b00011011, 0b11100100, 0b01000000 };
+            var indexedImageSource = new IndexedImageSource(2, imageData, 9, 1, pallette, transparencyMap);
+
+            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(16);
+            var colorData = truecolorImageSource.RawData;
+
+            // Should be 27 bytes -- 9 pixels @ 3 bytes per pixel.
+            var expectedData = new byte[] {
+                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
+                0x00, PalletteTestColors[2].R, 0x00, PalletteTestColors[2].G, 0x00, PalletteTestColors[2].B,
+                0x00, PalletteTestColors[3].R, 0x00, PalletteTestColors[3].G, 0x00, PalletteTestColors[3].B,
+                0x00, PalletteTestColors[3].R, 0x00, PalletteTestColors[3].G, 0x00, PalletteTestColors[3].B,
+                0x00, PalletteTestColors[2].R, 0x00, PalletteTestColors[2].G, 0x00, PalletteTestColors[2].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
+                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B
+            };
+
+            Assert.Equal(expectedData, colorData);
+        }
+
+        [Fact]
+        public void Can_convert_four_bit_image_data_to_truecolor_16_image_data()
+        {
+            var pallette = new Pallette(4);
+            var transparencyMap = new TransparencyMap(4);
+
+            for (int i = 0; i < 16; i++) {
+                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
+                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
+            }
+
+            var imageData = new byte[] { 0b01011010, 0b11110001, 0b00000110, 0b00100100, 0b11000000 };
+            var indexedImageSource = new IndexedImageSource(4, imageData, 9, 1, pallette, transparencyMap);
+
+            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(16);
+            var colorData = truecolorImageSource.RawData;
+
+            // Should be 27 bytes -- 9 pixels @ 3 bytes per pixel.
+            var expectedData = new byte[] {
+                0x00, PalletteTestColors[5].R, 0x00, PalletteTestColors[5].G, 0x00, PalletteTestColors[5].B,
+                0x00, PalletteTestColors[10].R, 0x00,  PalletteTestColors[10].G, 0x00, PalletteTestColors[10].B,
+                0x00, PalletteTestColors[15].R, 0x00,  PalletteTestColors[15].G, 0x00, PalletteTestColors[15].B,
+                0x00, PalletteTestColors[1].R, 0x00, PalletteTestColors[1].G, 0x00, PalletteTestColors[1].B,
+                0x00, PalletteTestColors[0].R, 0x00, PalletteTestColors[0].G, 0x00, PalletteTestColors[0].B,
+                0x00, PalletteTestColors[6].R, 0x00, PalletteTestColors[6].G, 0x00, PalletteTestColors[6].B,
+                0x00, PalletteTestColors[2].R, 0x00, PalletteTestColors[2].G, 0x00, PalletteTestColors[2].B,
+                0x00, PalletteTestColors[4].R, 0x00, PalletteTestColors[4].G, 0x00, PalletteTestColors[4].B,
+                0x00, PalletteTestColors[12].R, 0x00,  PalletteTestColors[12].G, 0x00, PalletteTestColors[12].B
+            };
+
+            Assert.Equal(expectedData, colorData);
+        }
+
+        [Fact]
+        public void Can_convert_eight_bit_image_data_to_truecolor_16_image_data()
+        {
+            var pallette = new Pallette(8);
+            var transparencyMap = new TransparencyMap(8);
+
+            for (int i = 0; i < 256; i++) {
+                var palletteIndex = pallette.AddColorToPallette(PalletteTestColors[i]);
+                transparencyMap.AddTransparencyToMap(palletteIndex, PalletteTestColors[i].A);
+            }
+
+            var imageData = new byte[] { 13, 44, 97, 93, 11, 5, 8, 9, 239 };
+            var indexedImageSource = new IndexedImageSource(8, imageData, 9, 1, pallette, transparencyMap);
+
+            var truecolorImageSource = indexedImageSource.ConvertToTruecolorImageSource(16);
+            var colorData = truecolorImageSource.RawData;
+
+            // Should be 27 bytes -- 9 pixels @ 3 bytes per pixel.
+            var expectedData = new byte[] {
+                0x00, PalletteTestColors[13].R, 0x00, PalletteTestColors[13].G, 0x00, PalletteTestColors[13].B,
+                0x00, PalletteTestColors[44].R, 0x00, PalletteTestColors[44].G, 0x00, PalletteTestColors[44].B,
+                0x00, PalletteTestColors[97].R, 0x00, PalletteTestColors[97].G, 0x00, PalletteTestColors[97].B,
+                0x00, PalletteTestColors[93].R, 0x00, PalletteTestColors[93].G, 0x00, PalletteTestColors[93].B,
+                0x00, PalletteTestColors[11].R, 0x00, PalletteTestColors[11].G, 0x00, PalletteTestColors[11].B,
+                0x00, PalletteTestColors[5].R, 0x00, PalletteTestColors[5].G, 0x00, PalletteTestColors[5].B,
+                0x00, PalletteTestColors[8].R, 0x00, PalletteTestColors[8].G, 0x00, PalletteTestColors[8].B,
+                0x00, PalletteTestColors[9].R, 0x00, PalletteTestColors[9].G, 0x00, PalletteTestColors[9].B,
+                0x00, PalletteTestColors[239].R, 0x00, PalletteTestColors[239].G, 0x00, PalletteTestColors[239].B
             };
 
             Assert.Equal(expectedData, colorData);
