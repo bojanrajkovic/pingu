@@ -29,7 +29,7 @@ before_build:
 build_script:
   - ps: |
       # Build
-      dotnet build -c Release
+      appveyor-retry dotnet build -c Release
 before_test:
   - ps: |
       # Install OpenCover and ReportGenerator for coverage
