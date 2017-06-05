@@ -107,7 +107,7 @@ class Program
     static void TestUp()
     {
         var up = new UpImplementations { TotalBytes = 5000 };
-        byte[] naive = new byte[up.TotalBytes], ptr = new byte[up.TotalBytes], unr = new byte[up.TotalBytes], 
+        byte[] naive = new byte[up.TotalBytes], ptr = new byte[up.TotalBytes], unr = new byte[up.TotalBytes],
                vec = new byte[up.TotalBytes], unro = new byte[up.TotalBytes], motion = new byte[up.TotalBytes];
 
         up.Setup();
@@ -231,17 +231,22 @@ class Program
         int i = 0;
         bool equal = true;
 
-        for (; i < expected.Length; i++) {
-            if (expected[i] != actual[i]) {
+        for (; i < expected.Length; i++)
+        {
+            if (expected[i] != actual[i])
+            {
                 equal = false;
                 break;
             }
         }
 
-        if (!equal) {
+        if (!equal)
+        {
             Console.WriteLine("Sequences are not equal from test methods, please check implementation.");
             Console.WriteLine($"Sequences differ at index {i}, expected {expected[i]}, actual {actual[i]}");
-        } else {
+        }
+        else
+        {
             Console.WriteLine("Sequences are equal, press any key to proceed.");
         }
     }
@@ -251,25 +256,31 @@ class Program
         int i = 0;
         bool equal = true;
 
-        for (; i < expected.Length; i++) {
-            if (expected[i] != actual[i]) {
+        for (; i < expected.Length; i++)
+        {
+            if (expected[i] != actual[i])
+            {
                 equal = false;
                 break;
             }
         }
 
-        if (!equal) {
+        if (!equal)
+        {
             Console.WriteLine("Sequences are not equal from test methods, please check implementation.");
             Console.WriteLine($"Sequences differ at index {i}, expected {expected[i]}, actual {actual[i]}");
-            if (expected.Length < 99) {
+            if (expected.Length < 99)
+            {
                 Console.WriteLine("Printing data, then expected, then actual.");
                 Console.WriteLine(string.Join("|", Enumerable.Range(0, expected.Length).Select(x => x.ToString("00"))));
                 Console.WriteLine(string.Join("|", Enumerable.Repeat("==", expected.Length)));
-                Console.WriteLine(BitConverter.ToString(data).Replace("-","|"));
+                Console.WriteLine(BitConverter.ToString(data).Replace("-", "|"));
                 Console.WriteLine(BitConverter.ToString(expected).Replace("-", "|"));
                 Console.WriteLine(BitConverter.ToString(actual).Replace("-", "|"));
             }
-        } else {
+        }
+        else
+        {
             Console.WriteLine("Sequences are equal, press any key to proceed.");
         }
     }
@@ -279,17 +290,21 @@ class Program
         int i = 0;
         bool equal = true;
 
-        for (; i < expected.Length; i++) {
-            if (expected[i] != actual[i]) {
+        for (; i < expected.Length; i++)
+        {
+            if (expected[i] != actual[i])
+            {
                 equal = false;
                 break;
             }
         }
 
-        if (!equal) {
+        if (!equal)
+        {
             Console.WriteLine("Sequences are not equal from test methods, please check implementation.");
             Console.WriteLine($"Sequences differ at index {i}, expected {expected[i]}, actual {actual[i]}");
-            if (expected.Length < 99) {
+            if (expected.Length < 99)
+            {
                 Console.WriteLine("Printing data, then previous, then expected, then actual.");
                 Console.WriteLine(string.Join("-", Enumerable.Range(0, expected.Length).Select(x => x.ToString("00"))));
                 Console.WriteLine(BitConverter.ToString(data));
@@ -297,7 +312,9 @@ class Program
                 Console.WriteLine(BitConverter.ToString(expected));
                 Console.WriteLine(BitConverter.ToString(actual));
             }
-        } else {
+        }
+        else
+        {
             Console.WriteLine("Sequences are equal, press any key to proceed.");
         }
     }

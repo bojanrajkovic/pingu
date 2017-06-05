@@ -1,20 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.25920.0
+VisualStudioVersion = 15.0.26510.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pingu", "src\Pingu\Pingu.csproj", "{0B160E02-1A00-4A8C-99DE-3404F046E03C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pingu", "src\Pingu\Pingu.csproj", "{0B160E02-1A00-4A8C-99DE-3404F046E03C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pingu.Tests", "src\Pingu.Tests\Pingu.Tests.csproj", "{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pingu.Tests", "src\Pingu.Tests\Pingu.Tests.csproj", "{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pingu.Benchmarks", "src\Pingu.Benchmarks\Pingu.Benchmarks.csproj", "{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pingu.Benchmarks", "src\Pingu.Benchmarks\Pingu.Benchmarks.csproj", "{E0EE6818-C333-4F58-A305-776F4ACA3976}"
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -28,10 +25,10 @@ Global
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0EE6818-C333-4F58-A305-776F4ACA3976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0EE6818-C333-4F58-A305-776F4ACA3976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0EE6818-C333-4F58-A305-776F4ACA3976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0EE6818-C333-4F58-A305-776F4ACA3976}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +36,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0B160E02-1A00-4A8C-99DE-3404F046E03C} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
-		{96FD5BE3-43F6-4E28-B88E-37CC22A85C03} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
+		{E0EE6818-C333-4F58-A305-776F4ACA3976} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

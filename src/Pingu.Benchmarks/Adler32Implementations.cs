@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Columns;
-using BenchmarkDotNet.Attributes.Jobs;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Order;
 
 namespace Pingu.Benchmarks
 {
+    [Config(typeof(Config))]
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
-    [RankColumn(NumeralSystem.Arabic)]
-    [RyuJitX64Job, LegacyJitX64Job, MonoJob]
     public class Adler32Implementations
     {
         Random rand = new Random();
-        byte[] data = new byte[77];
+        byte[] data = new byte[5000];
 
         [Setup]
         public void SetupData() => rand.NextBytes(data);
