@@ -24,7 +24,7 @@ namespace Pingu.Benchmarks
             return (float)(mantissa * exponent);
         }
 
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             FloorData = new float[FloatsToFloor];

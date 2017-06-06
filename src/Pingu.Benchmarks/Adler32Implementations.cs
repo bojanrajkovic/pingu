@@ -13,7 +13,7 @@ namespace Pingu.Benchmarks
         Random rand = new Random();
         byte[] data = new byte[5000];
 
-        [Setup]
+        [GlobalSetup]
         public void SetupData() => rand.NextBytes(data);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

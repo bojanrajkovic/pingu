@@ -26,7 +26,7 @@ namespace Pingu.Benchmarks
 
         static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             TargetBuffer = new byte[TotalBytes];

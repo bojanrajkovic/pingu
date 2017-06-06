@@ -26,12 +26,12 @@ namespace Pingu.Benchmarks
                 Add(Job.Mono);
                 Add(Job.Mono.With(Jit.Llvm));
             } else {
-                Add(Job.RyuJitX64.With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20).WithGcServer(true).WithGcConcurrent(true));
-                //Add(Job.RyuJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
-                //Add(Job.LegacyJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
-                //Add(Job.LegacyJitX86.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
-                //Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")));
-                //Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")).With(Jit.Llvm));
+                Add(Job.RyuJitX64.With(Runtime.Core).With(CsProjNet46Toolchain.Instance).WithGcServer(true).WithGcConcurrent(true));
+                Add(Job.RyuJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
+                Add(Job.LegacyJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
+                Add(Job.LegacyJitX86.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
+                Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")));
+                Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")).With(Jit.Llvm));
             }
         }
     }

@@ -1,9 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.0;net46</TargetFrameworks>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <TargetFramework>net46</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
@@ -16,9 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.10.6" />
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.10.6" />
-    <PackageReference Include="BenchmarkDotNet.Toolchains.Roslyn" Version="0.10.6" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.10.7" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.10.7" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.3.0" />
   </ItemGroup>
 
