@@ -4,8 +4,11 @@ environment:
   PINGU_ASSEMBLY_VERSION: 1.0.0
   PINGU_VERSION_FILE: Pingu.version
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  BENCHMARK_PROJECT_ID: c2d4e898-8a13-4e7b-8df9-89e71ceb00b7
   COVERALLS_REPO_TOKEN:
     secure: rXQYRJDH6xRwjKr+wood5fZ4VnA8MSej+rFO1j7+2rf2aJwTmwma9t+Xqwf/AoVZ
+  BENCHMARK_UPLOAD_KEY:
+    secure: ILzBavhhTahybf1B9TXR0eFxXFVFYjoSCfugB4iL8M17v6orf6zk4Tm0qh1FGgC+mxfZmNA+4H5vmW7YBWpXUEEfVEDdcGCTKmLy7K5KyvajmirDJ5aas19AOzxWo5CT
 install:
   - ps: |
       # Compute version number
@@ -29,7 +32,7 @@ before_build:
 build_script:
   - ps: |
       # Build
-      appveyor-retry dotnet build -c Release
+      dotnet build -c Release
 before_test:
   - ps: |
       # Install OpenCover and ReportGenerator for coverage
@@ -52,6 +55,20 @@ after_test:
       .\packages\coveralls.net.0.7.0\tools\csmacnz.Coveralls.exe --opencover -i coverage.xml --repoToken $env:COVERALLS_REPO_TOKEN `
         --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR `
         --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_JOB_ID
+  - ps: |
+      # Run benchmarks
+      Push-Location .\src\Pingu.Benchmarks
+      dotnet run -c Release
+      Pop-Location
+  - ps: |
+      # Upload benchmarks
+      Push-Location .\src\Pingu.BenchmarkUploader
+      $benchmarkOutputs = Get-ChildItem ..\Pingu.Benchmarks\BenchmarkDotNet.Artifacts\results\*-report-brief.json
+      $benchmarkOutputs | % {
+        dotnet run -- -i $env:BENCHMARK_PROJECT_ID -r $env:APPVEYOR_REPO_COMMIT -b $env:APPVEYOR_REPO_BRANCH -k $env:BENCHMARK_UPLOAD_KEY `
+          -d "BenchmarkDotNet" -f "$_.FullName"
+      }
+      Pop-Location
   - ps: |
       # Build NuGet package
       if (($env:APPVEYOR_REPO_BRANCH -eq "master") -and ($env:APPVEYOR_PULL_REQUEST_TITLE -eq $null)) {

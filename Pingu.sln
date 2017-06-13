@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pingu.Tests", "src\Pingu.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pingu.Benchmarks", "src\Pingu.Benchmarks\Pingu.Benchmarks.csproj", "{E0EE6818-C333-4F58-A305-776F4ACA3976}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pingu.BenchmarkUploader", "src\Pingu.BenchmarkUploader\Pingu.BenchmarkUploader.csproj", "{0D9782B2-D799-45B1-878F-574816131B06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{E0EE6818-C333-4F58-A305-776F4ACA3976}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0EE6818-C333-4F58-A305-776F4ACA3976}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0EE6818-C333-4F58-A305-776F4ACA3976}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D9782B2-D799-45B1-878F-574816131B06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D9782B2-D799-45B1-878F-574816131B06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D9782B2-D799-45B1-878F-574816131B06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D9782B2-D799-45B1-878F-574816131B06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +43,7 @@ Global
 		{0B160E02-1A00-4A8C-99DE-3404F046E03C} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
 		{9A3777C0-AA8A-40BC-92C4-C3FE30D76E6C} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
 		{E0EE6818-C333-4F58-A305-776F4ACA3976} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
+		{0D9782B2-D799-45B1-878F-574816131B06} = {AA2EDA1C-792B-4D76-8FDE-8A27BAC1ACC5}
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

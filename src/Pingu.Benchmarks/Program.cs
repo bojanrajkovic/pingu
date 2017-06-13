@@ -29,7 +29,6 @@ class Program
                 typeof (UpImplementations),
                 typeof (AvgImplementations),
                 typeof (PaethImplementations),
-                typeof (TemporaryBenchmark),
             });
 
             switcher.Run(args);
@@ -42,7 +41,6 @@ class Program
             BenchmarkRunner.Run<UpImplementations>();
             BenchmarkRunner.Run<AvgImplementations>();
             BenchmarkRunner.Run<PaethImplementations>();
-            BenchmarkRunner.Run<TemporaryBenchmark>();
         }
     }
 
