@@ -1,14 +1,14 @@
 ﻿using System;
+using System.IO;
 
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Order;
 
 namespace Pingu.Benchmarks
 {
@@ -16,9 +16,13 @@ namespace Pingu.Benchmarks
     {
         public Config()
         {
-            Add(BenchmarkDotNet.Diagnosers.MemoryDiagnoser.Default);
+            Add(MemoryDiagnoser.Default);
             Add(new RankColumn(NumeralSystem.Arabic));
-            Add(HardwareCounter.CacheMisses, HardwareCounter.BranchMispredictions, HardwareCounter.TotalCycles);
+
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == null)
+                Add(HardwareCounter.CacheMisses, HardwareCounter.BranchMispredictions, HardwareCounter.TotalCycles);
+
+            Add(JsonExporter.FullCompressed, JsonExporter.Full, JsonExporter.Brief);
 
             var platform = Environment.OSVersion.Platform;
 
@@ -30,8 +34,11 @@ namespace Pingu.Benchmarks
                 Add(Job.RyuJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
                 Add(Job.LegacyJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
                 Add(Job.LegacyJitX86.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
-                Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")));
-                Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")).With(Jit.Llvm));
+
+                if (File.Exists(@"C:\Program Files\Mono\bin\mono.exe")) {
+                    Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")));
+                    Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")).With(Jit.Llvm));
+                }
             }
         }
     }

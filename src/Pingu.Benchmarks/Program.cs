@@ -17,18 +17,33 @@ class Program
         // TestMinSad();
         // TestFloor();
 
-        var switcher = new BenchmarkSwitcher(new[] {
-            typeof (Crc32Implementations),
-            typeof (Adler32Implementations),
-            typeof (MinSadImplementations),
-            typeof (FloorImplementations),
-            typeof (SubImplementations),
-            typeof (UpImplementations),
-            typeof (AvgImplementations),
-            typeof (PaethImplementations)
-        });
+        var ci = Environment.GetEnvironmentVariable("APPVEYOR") != null;
 
-        switcher.Run(args);
+        if (!ci) {
+            var switcher = new BenchmarkSwitcher(new[] {
+                typeof (Crc32Implementations),
+                typeof (Adler32Implementations),
+                typeof (MinSadImplementations),
+                typeof (FloorImplementations),
+                typeof (SubImplementations),
+                typeof (UpImplementations),
+                typeof (AvgImplementations),
+                typeof (PaethImplementations),
+                typeof (TemporaryBenchmark),
+            });
+
+            switcher.Run(args);
+        } else {
+            BenchmarkRunner.Run<Crc32Implementations>();
+            BenchmarkRunner.Run<Adler32Implementations>();
+            BenchmarkRunner.Run<MinSadImplementations>();
+            BenchmarkRunner.Run<FloorImplementations>();
+            BenchmarkRunner.Run<SubImplementations>();
+            BenchmarkRunner.Run<UpImplementations>();
+            BenchmarkRunner.Run<AvgImplementations>();
+            BenchmarkRunner.Run<PaethImplementations>();
+            BenchmarkRunner.Run<TemporaryBenchmark>();
+        }
     }
 
     static void TestFloor()
