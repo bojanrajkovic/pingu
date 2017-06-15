@@ -4,6 +4,8 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <TargetFramework>netstandard1.3</TargetFramework>
     <DebugType>full</DebugType>
+    <GitSkipCache>true</GitSkipCache>
+    <GitVersionFile>Pingu.version</GitVersionFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,9 +31,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitInfo" Version="1.1.62" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
   </ItemGroup>
-
 </Project>
