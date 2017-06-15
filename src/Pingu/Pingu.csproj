@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitInfo" Version="1.1.62" />
+    <PackageReference Include="GitInfo" Version="1.1.63" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
