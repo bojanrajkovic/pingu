@@ -6,6 +6,8 @@ using Pingu.Benchmarks;
 
 class Program
 {
+    public static bool IsCIBuild { get; set; }
+
     static void Main(string[] args)
     {
         // TestAdler ();
@@ -17,9 +19,11 @@ class Program
         // TestMinSad();
         // TestFloor();
 
-        var ci = Environment.GetEnvironmentVariable("APPVEYOR") != null;
+        IsCIBuild = args.Length > 0 && args[0] == "--ci";
 
-        if (!ci) {
+        if (!IsCIBuild) {
+            // These are all the various benchmarks written as part of testing
+            // fast implementations for parts of PNG.
             var switcher = new BenchmarkSwitcher(new[] {
                 typeof (Crc32Implementations),
                 typeof (Adler32Implementations),
@@ -29,18 +33,18 @@ class Program
                 typeof (UpImplementations),
                 typeof (AvgImplementations),
                 typeof (PaethImplementations),
+                typeof (UpFilterBenchmark)
             });
 
             switcher.Run(args);
         } else {
-            BenchmarkRunner.Run<Crc32Implementations>();
-            BenchmarkRunner.Run<Adler32Implementations>();
-            BenchmarkRunner.Run<MinSadImplementations>();
-            BenchmarkRunner.Run<FloorImplementations>();
-            BenchmarkRunner.Run<SubImplementations>();
-            BenchmarkRunner.Run<UpImplementations>();
-            BenchmarkRunner.Run<AvgImplementations>();
-            BenchmarkRunner.Run<PaethImplementations>();
+            // We want to run these benchmarks in CI to catch perf regressions.
+            BenchmarkRunner.Run<UpFilterBenchmark>();
+            /*BenchmarkRunner.Run<AvgFilterBenchmark>();
+            BenchmarkRunner.Run<SubFilterBenchmark>();
+            BenchmarkRunner.Run<PaethFilterBenchmark>();
+            BenchmarkRunner.Run<DynamicFilterBenchmark>();
+            BenchmarkRunner.Run<PngFileBenchmark>();*/
         }
     }
 

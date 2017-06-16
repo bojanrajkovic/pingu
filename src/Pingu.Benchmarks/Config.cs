@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -16,29 +15,22 @@ namespace Pingu.Benchmarks
     {
         public Config()
         {
-            Add(MemoryDiagnoser.Default);
-            Add(new RankColumn(NumeralSystem.Arabic));
+            var isMonoPlatform = Path.DirectorySeparatorChar == '/';
 
-            if (Environment.GetEnvironmentVariable("APPVEYOR") == null)
-                Add(HardwareCounter.CacheMisses, HardwareCounter.BranchMispredictions, HardwareCounter.TotalCycles);
+            if (!isMonoPlatform)
+                Add(MemoryDiagnoser.Default);
+
+            Add(new RankColumn(NumeralSystem.Arabic));
 
             Add(JsonExporter.FullCompressed, JsonExporter.Full, JsonExporter.Brief);
 
-            var platform = Environment.OSVersion.Platform;
-
-            if (platform == PlatformID.MacOSX || platform == PlatformID.Unix) {
+            if (isMonoPlatform) {
                 Add(Job.Mono);
                 Add(Job.Mono.With(Jit.Llvm));
+                Add(Job.RyuJitX64.With(Runtime.Core).WithGcServer(true).WithGcConcurrent(true));
             } else {
-                Add(Job.RyuJitX64.With(Runtime.Core).With(CsProjNet46Toolchain.Instance).WithGcServer(true).WithGcConcurrent(true));
-                Add(Job.RyuJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
-                Add(Job.LegacyJitX64.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
-                Add(Job.LegacyJitX86.With(Runtime.Clr).WithGcServer(true).WithGcConcurrent(true));
-
-                if (File.Exists(@"C:\Program Files\Mono\bin\mono.exe")) {
-                    Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")));
-                    Add(Job.Mono.With(new MonoRuntime("Mono", @"C:\Program Files\Mono\bin\mono.exe")).With(Jit.Llvm));
-                }
+                Add(Job.RyuJitX64.With(Runtime.Core).WithGcConcurrent(true));
+                Add(Job.RyuJitX64.With(Runtime.Clr).WithGcConcurrent(true));
             }
         }
     }
