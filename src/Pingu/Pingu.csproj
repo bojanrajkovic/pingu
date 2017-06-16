@@ -36,4 +36,12 @@
     <PackageReference Include="System.Numerics.Vectors" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
   </ItemGroup>
+
+  <Target Name="SetVersion" BeforeTargets="GenerateNuspec;_GenerateRestoreProjectSpec">
+    <PropertyGroup>
+      <VersionPrefix>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</VersionPrefix>
+      <VersionSuffix>$(GitSemVerLabel)</VersionSuffix>
+      <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</PackageVersion>
+    </PropertyGroup>
+  </Target>
 </Project>
