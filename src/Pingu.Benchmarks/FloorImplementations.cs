@@ -20,7 +20,7 @@ namespace Pingu.Benchmarks
         static float NextFloat(Random random)
         {
             double mantissa = (random.NextDouble() * 2.0) - 1.0;
-            double exponent = Math.Pow(2.0, random.Next(0, 128));
+            double exponent = System.Math.Pow(2.0, random.Next(0, 128));
             return (float)(mantissa * exponent);
         }
 
@@ -38,7 +38,7 @@ namespace Pingu.Benchmarks
         public void MathFloor()
         {
             for (int i = 0; i < FloatsToFloor; i++)
-                FlooredData[i] = (int) Math.Floor(FloorData[i]);
+                FlooredData[i] = (int) System.Math.Floor(FloorData[i]);
         }
 
         [Benchmark]
