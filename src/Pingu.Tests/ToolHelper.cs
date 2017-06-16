@@ -11,7 +11,9 @@ namespace Pingu.Tests
         {
             var asm = typeof(ToolHelper).GetTypeInfo().Assembly;
             var assemblyDir = Path.GetDirectoryName(asm.Location);
-            var pngcheckPath = Path.Combine(
+
+            // It'll be on the path on Linux/Mac, we ship it for Windows.
+            var pngcheckPath = Path.DirectorySeparatorChar == '\\' ? Path.Combine(
                 assemblyDir,
                 "..",
                 "..",
@@ -19,7 +21,7 @@ namespace Pingu.Tests
                 "..",
                 "..",
                 "tools",
-                "pngcheck.exe");
+                "pngcheck.exe") : "pngcheck";
 
             return Exe(pngcheckPath, "-v", path);
         }
