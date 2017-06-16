@@ -37,7 +37,10 @@
     <PackageReference Include="System.Runtime" Version="4.3.0" />
   </ItemGroup>
 
-  <Target Name="SetVersion" BeforeTargets="GenerateNuspec;_GenerateRestoreProjectSpec">
+  <Target Name="SetVersion"
+          DependsOnTargets="GitInfo"
+          BeforeTargets="CoreCompile;GetAssemblyVersion;GenerateNuspec;_GenerateRestoreProjectSpec;EnsureWixToolsetInstalled"
+          Condition="$(GitInfoImported) == 'True'">
     <PropertyGroup>
       <VersionPrefix>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</VersionPrefix>
       <VersionSuffix>$(GitSemVerLabel)</VersionSuffix>
