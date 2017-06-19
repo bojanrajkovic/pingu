@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using Pingu.Checksums;
@@ -74,17 +75,33 @@ namespace Pingu.Chunks
             byte[] previousScanline = null, scanline = new byte[imageInfo.Width * pixelWidth],
                    scanlineToWrite = new byte[1 + imageInfo.Width * pixelWidth];
 
+            var tempStream = new MemoryStream();
+
+            // TODO: Someday, instead of writing to a stream, do this all with direct offsets
+            // into an array. We should be able to preallocate an array of the correct length
+            // and simply write the bytes and update offsets.
             for (int i = 0; i < imageInfo.Height; i++) {
+                // Copy raw RGB data to scanline.
                 Buffer.BlockCopy(rawRgbData, i * scanline.Length, scanline, 0, scanline.Length);
 
+                // Filter scanline into scanlineToWrite.
                 FilterInto(scanlineToWrite, 1, scanline, previousScanline, pixelWidth);
-                adler.FeedBlock(scanlineToWrite);
-                await deflateStream.WriteAsync(scanlineToWrite, 0, scanlineToWrite.Length);
 
+                // Write scanline to stream.
+                await tempStream.WriteAsync(scanlineToWrite, 0, scanlineToWrite.Length);
+
+                // Allocate previous scanline if needed.
                 previousScanline = previousScanline ?? new byte[scanline.Length];
+
+                // Copy current scanline onto previous scanline.
                 Buffer.BlockCopy(scanline, 0, previousScanline, 0, scanline.Length);
             }
 
+            var data = tempStream.ToArray();
+            adler.FeedBlock(data);
+            await deflateStream.WriteAsync(data, 0, data.Length);
+
+            tempStream.Dispose();
             deflateStream.Dispose();
 
             // Write the ADLER32 Zlib checksum
