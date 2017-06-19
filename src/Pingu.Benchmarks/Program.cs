@@ -43,9 +43,9 @@ class Program
             BenchmarkRunner.Run<UpFilterBenchmark>();
             BenchmarkRunner.Run<AvgFilterBenchmark>();
             BenchmarkRunner.Run<SubFilterBenchmark>();
-            /*BenchmarkRunner.Run<PaethFilterBenchmark>();
+            BenchmarkRunner.Run<PaethFilterBenchmark>();
             BenchmarkRunner.Run<DynamicFilterBenchmark>();
-            BenchmarkRunner.Run<PngFileBenchmark>();*/
+            /*BenchmarkRunner.Run<PngFileBenchmark>();*/
         }
     }
 
