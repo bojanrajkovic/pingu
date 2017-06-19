@@ -42,8 +42,8 @@ class Program
             // We want to run these benchmarks in CI to catch perf regressions.
             BenchmarkRunner.Run<UpFilterBenchmark>();
             BenchmarkRunner.Run<AvgFilterBenchmark>();
-            /* BenchmarkRunner.Run<SubFilterBenchmark>();
-            BenchmarkRunner.Run<PaethFilterBenchmark>();
+            BenchmarkRunner.Run<SubFilterBenchmark>();
+            /*BenchmarkRunner.Run<PaethFilterBenchmark>();
             BenchmarkRunner.Run<DynamicFilterBenchmark>();
             BenchmarkRunner.Run<PngFileBenchmark>();*/
         }
