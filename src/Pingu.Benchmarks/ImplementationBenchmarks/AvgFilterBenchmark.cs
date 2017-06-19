@@ -3,14 +3,17 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 
-namespace Pingu.Benchmarks
+namespace Pingu.Benchmarks.ImplementationBenchmarks
 {
     [Config(typeof(Config))]
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
-    public class UpFilterBenchmark
+    public class AvgFilterBenchmark
     {
         const int TotalBytes = 5000;
         byte[] targetBuffer, rawScanline, previousScanline;
+
+        [Params(3, 4)]
+        public int BytesPerPixel { get; set; }
 
         static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
@@ -25,17 +28,10 @@ namespace Pingu.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public void PinguUpFilterVectors()
+        public void PinguAvgFilter()
         {
-            var filter = Filters.UpFilter.Instance;
-            filter.VectorAndPointerFilterInto(targetBuffer, 0, rawScanline, previousScanline);
-        }
-
-        [Benchmark]
-        public void PinguUpFilterPointers()
-        {
-            var filter = Filters.UpFilter.Instance;
-            filter.UnrolledPointerFilterInto(targetBuffer, 0, rawScanline, previousScanline);
+            var filter = Filters.AvgFilter.Instance;
+            filter.FilterInto(targetBuffer, 0, rawScanline, previousScanline, BytesPerPixel);
         }
     }
 }

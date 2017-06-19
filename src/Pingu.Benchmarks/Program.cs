@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Running;
 
 using Pingu.Benchmarks;
+using Pingu.Benchmarks.ImplementationBenchmarks;
 
 class Program
 {
@@ -40,8 +41,8 @@ class Program
         } else {
             // We want to run these benchmarks in CI to catch perf regressions.
             BenchmarkRunner.Run<UpFilterBenchmark>();
-            /*BenchmarkRunner.Run<AvgFilterBenchmark>();
-            BenchmarkRunner.Run<SubFilterBenchmark>();
+            BenchmarkRunner.Run<AvgFilterBenchmark>();
+            /* BenchmarkRunner.Run<SubFilterBenchmark>();
             BenchmarkRunner.Run<PaethFilterBenchmark>();
             BenchmarkRunner.Run<DynamicFilterBenchmark>();
             BenchmarkRunner.Run<PngFileBenchmark>();*/
