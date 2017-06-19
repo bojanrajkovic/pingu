@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Running;
 
 using Pingu.Benchmarks;
+using Pingu.Benchmarks.ImplementationBenchmarks;
 
 class Program
 {
@@ -33,18 +35,23 @@ class Program
                 typeof (UpImplementations),
                 typeof (AvgImplementations),
                 typeof (PaethImplementations),
-                typeof (UpFilterBenchmark)
+                typeof (UpFilterBenchmark),
+                typeof (AvgFilterBenchmark),
+                typeof (SubFilterBenchmark),
+                typeof (PaethFilterBenchmark),
+                typeof (DynamicFilterBenchmark),
+                typeof (PngFileBenchmark)
             });
 
             switcher.Run(args);
         } else {
             // We want to run these benchmarks in CI to catch perf regressions.
             BenchmarkRunner.Run<UpFilterBenchmark>();
-            /*BenchmarkRunner.Run<AvgFilterBenchmark>();
+            BenchmarkRunner.Run<AvgFilterBenchmark>();
             BenchmarkRunner.Run<SubFilterBenchmark>();
             BenchmarkRunner.Run<PaethFilterBenchmark>();
             BenchmarkRunner.Run<DynamicFilterBenchmark>();
-            BenchmarkRunner.Run<PngFileBenchmark>();*/
+            BenchmarkRunner.Run<PngFileBenchmark>();
         }
     }
 
