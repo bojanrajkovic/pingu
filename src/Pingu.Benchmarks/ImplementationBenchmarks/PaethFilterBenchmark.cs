@@ -28,7 +28,7 @@ namespace Pingu.Benchmarks.ImplementationBenchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public void PinguSubFilterPointers()
+        public void PinguPaethFilterPointers()
         {
             var filter = Filters.PaethFilter.Instance;
             filter.FilterInto(targetBuffer, 0, rawScanline, previousScanline, BytesPerPixel);
