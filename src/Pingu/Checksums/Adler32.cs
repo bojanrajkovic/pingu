@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Pingu.Checksums
@@ -9,20 +8,9 @@ namespace Pingu.Checksums
         const int Adler32Modulus = 65521;
         const int NMax = 5552;
 
-        uint a = 1, b = 0;
+        uint a = 1, b;
 
         public int Hash => unchecked((int)((b << 16) | a));
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do16(byte* buf, ref uint a, ref uint b) { Do8(buf, 0, ref a, ref b); Do8(buf, 8, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do8(byte* buf, int i, ref uint a, ref uint b) { Do4(buf, i, ref a, ref b); Do4(buf, i + 4, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do4(byte* buf, int i, ref uint a, ref uint b) { Do2(buf, i, ref a, ref b); Do2(buf, i + 2, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do2(byte* buf, int i, ref uint a, ref uint b) { Do1(buf, i, ref a, ref b); Do1(buf, i + 1, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do1(byte* buf, int i, ref uint a, ref uint b) { a += buf[i]; b += a; }
 
         // See Adler32Implementation in the benchmarks suite. This is the best implementation
         // on RyuJIT and Mono, and not far behind on the legacy 64-bit JIT. It relies on the fact that
@@ -35,12 +23,44 @@ namespace Pingu.Checksums
         {
             fixed (byte* ptr = data) {
                 byte* buf = ptr + offset;
-                int chunkSize;
                 while (length > 0) {
-                    chunkSize = length < NMax ? length : NMax;
+                    var chunkSize = length < NMax ? length : NMax;
                     length -= chunkSize;
                     while (chunkSize >= 16) {
-                        Do16(buf, ref a, ref b);
+                        // This is a hand-unrolled 16 byte loop. Do not touch.
+                        a += buf[0];
+                        b += a;
+                        a += buf[1];
+                        b += a;
+                        a += buf[2];
+                        b += a;
+                        a += buf[3];
+                        b += a;
+                        a += buf[4];
+                        b += a;
+                        a += buf[5];
+                        b += a;
+                        a += buf[6];
+                        b += a;
+                        a += buf[7];
+                        b += a;
+                        a += buf[8];
+                        b += a;
+                        a += buf[9];
+                        b += a;
+                        a += buf[10];
+                        b += a;
+                        a += buf[11];
+                        b += a;
+                        a += buf[12];
+                        b += a;
+                        a += buf[13];
+                        b += a;
+                        a += buf[14];
+                        b += a;
+                        a += buf[15];
+                        b += a;
+                        // End hand-unrolled loop.
                         buf += 16;
                         chunkSize -= 16;
                     }
