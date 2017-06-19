@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Running;
 
 using Pingu.Benchmarks;
@@ -34,7 +35,12 @@ class Program
                 typeof (UpImplementations),
                 typeof (AvgImplementations),
                 typeof (PaethImplementations),
-                typeof (UpFilterBenchmark)
+                typeof (UpFilterBenchmark),
+                typeof (AvgFilterBenchmark),
+                typeof (SubFilterBenchmark),
+                typeof (PaethFilterBenchmark),
+                typeof (DynamicFilterBenchmark),
+                typeof (PngFileBenchmark)
             });
 
             switcher.Run(args);
@@ -45,7 +51,7 @@ class Program
             BenchmarkRunner.Run<SubFilterBenchmark>();
             BenchmarkRunner.Run<PaethFilterBenchmark>();
             BenchmarkRunner.Run<DynamicFilterBenchmark>();
-            /*BenchmarkRunner.Run<PngFileBenchmark>();*/
+            BenchmarkRunner.Run<PngFileBenchmark>();
         }
     }
 
