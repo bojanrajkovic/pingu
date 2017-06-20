@@ -8,7 +8,7 @@ namespace Pingu.Tests
 {
     public class SubFilterTests
     {
-        public static IEnumerable<object[]> SubFilterTestVectors()
+        static IEnumerable<object[]> SubFilterTestVectors()
         {
             unchecked {
                 yield return new object[] {
@@ -37,7 +37,7 @@ namespace Pingu.Tests
         {
             var filter = SubFilter.Instance;
             var filteredScanline = new byte[expected.Length];
-            filter.UnrolledPointerFilterInto(filteredScanline, 0, input, null, bytesPerPixel);
+            filter.UnrolledPointerFilterInto(filteredScanline, 0, input, bytesPerPixel);
 
             Assert.Equal(expected, filteredScanline);
         }
@@ -48,7 +48,7 @@ namespace Pingu.Tests
         {
             var filter = SubFilter.Instance;
             var filteredScanline = new byte[expected.Length];
-            filter.VectorAndPointerFilterInto(filteredScanline, 0, input, null, bytesPerPixel);
+            filter.VectorAndPointerFilterInto(filteredScanline, 0, input, bytesPerPixel);
 
             Assert.Equal(expected, filteredScanline);
         }

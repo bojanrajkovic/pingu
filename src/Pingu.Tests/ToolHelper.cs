@@ -26,7 +26,7 @@ namespace Pingu.Tests
             return Exe(pngcheckPath, "-v", path);
         }
 
-        public static ProcessResult Exe(string command, params string[] args)
+        static ProcessResult Exe(string command, params string[] args)
         {
             var startInfo = new ProcessStartInfo {
                 FileName = command,
