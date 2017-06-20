@@ -44,7 +44,8 @@
     <PropertyGroup>
       <VersionPrefix>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</VersionPrefix>
       <VersionSuffix>$(GitSemVerLabel)</VersionSuffix>
-      <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</PackageVersion>
+      <PackageVersion Condition="'$(GitBranch)' == 'master'">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)</PackageVersion>
+      <PackageVersion Condition="'$(GitBranch)' != 'master'">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)+$(GitBranch)-$(GitCommit)</PackageVersion>
     </PropertyGroup>
   </Target>
 </Project>
