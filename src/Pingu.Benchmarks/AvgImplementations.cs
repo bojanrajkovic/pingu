@@ -17,14 +17,14 @@ namespace Pingu.Benchmarks
         [Params(true, false)]
         public bool HasPreviousScanline { get; set; }
 
-        [Params(4)]
-        public int BytesPerPixel { get; set; }
+        const int BytesPerPixel = 4;
+        const int TargetOffset = 0;
 
-        public byte[] TargetBuffer { get; set; }
-        public byte[] RawScanline { get; set; }
-        public byte[] PreviousScanline { get; set; }
+        public byte[] TargetBuffer { get; private set; }
+        public byte[] RawScanline { get; private set; }
+        public byte[] PreviousScanline { get; private set; }
 
-        static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
+        static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
         [GlobalSetup]
         public void Setup()
@@ -33,58 +33,54 @@ namespace Pingu.Benchmarks
             RawScanline = new byte[TotalBytes];
             PreviousScanline = HasPreviousScanline ? new byte[TotalBytes] : null;
 
-            rng.GetBytes(RawScanline);
+            Rng.GetBytes(RawScanline);
 
             if (HasPreviousScanline)
-                rng.GetBytes(PreviousScanline);
+                // ReSharper disable once AssignNullToNotNullAttribute
+                Rng.GetBytes(PreviousScanline);
         }
 
         [Benchmark(Baseline = true)]
-        public unsafe void NaiveWithNullablePrevious()
+        public void NaiveWithNullablePrevious()
         {
-            int targetOffset = 0;
+            var i = 0;
 
-            int i = 0;
             for (; i < BytesPerPixel; i++)
-                TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - ((PreviousScanline?[i] ?? 0)) / 2));
+                TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - (PreviousScanline?[i] ?? 0) / 2));
             for (; i < RawScanline.Length; i++)
-                TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - (RawScanline[i - BytesPerPixel] + (PreviousScanline?[i] ?? 0)) / 2));
+                TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - (RawScanline[i - BytesPerPixel] + (PreviousScanline?[i] ?? 0)) / 2));
         }
 
         [Benchmark]
-        public unsafe void NaiveWithSeparateLoops()
+        public void NaiveWithSeparateLoops()
         {
-            int targetOffset = 0;
-
             if (PreviousScanline == null) {
-                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, targetOffset, BytesPerPixel);
+                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, TargetOffset, BytesPerPixel);
                 for (var i = BytesPerPixel; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel] / 2));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel] / 2));
             } else {
-                int i = 0;
+                var i = 0;
                 for (; i < BytesPerPixel; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i] / 2));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i] / 2));
                 for (; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - (RawScanline[i - BytesPerPixel] + PreviousScanline[i]) / 2));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - (RawScanline[i - BytesPerPixel] + PreviousScanline[i]) / 2));
             }
         }
 
         [Benchmark]
         public unsafe void Pointer()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetUnoffset = TargetBuffer)
             fixed (byte* raw = RawScanline)
             fixed (byte* previous = PreviousScanline) {
-                byte* target = targetUnoffset + targetOffset;
+                var target = targetUnoffset + TargetOffset;
 
                 if (previous == null) {
                     Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
                     for (var i = BytesPerPixel; i < RawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
                 } else {
-                    int i = 0;
+                    var i = 0;
                     for (; i < BytesPerPixel;  i++)
                         target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
                     for (; i < RawScanline.Length; i++)
@@ -96,16 +92,14 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void PointerUnrolled()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetUnoffset = TargetBuffer)
             fixed (byte* raw = RawScanline)
             fixed (byte* previous = PreviousScanline) {
-                byte* target = targetUnoffset + targetOffset;
+                var target = targetUnoffset + TargetOffset;
 
                 if (previous == null) {
                     Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
-                    int i = BytesPerPixel;
+                    var i = BytesPerPixel;
                     for (; RawScanline.Length - i > 8; i += 8) {
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
                         target[i + 1] = unchecked((byte)(raw[i + 1] - raw[i + 1 - BytesPerPixel] / 2));
@@ -119,7 +113,7 @@ namespace Pingu.Benchmarks
                     for (; i < RawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
                 } else {
-                    int i = 0;
+                    var i = 0;
                     for (; i < BytesPerPixel; i++)
                         target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
                     for (; RawScanline.Length - i > 8; i += 8) {
@@ -141,19 +135,17 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void PointerUnrolledMotion()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetUnoffset = TargetBuffer)
             fixed (byte* raw = RawScanline)
             fixed (byte* previous = PreviousScanline) {
-                byte* target = targetUnoffset + targetOffset;
+                var target = targetUnoffset + TargetOffset;
 
                 if (previous == null) {
                     // Basically Sub, but with the Raw(x-bpp) value divided by 2
                     Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
 
                     unchecked {
-                        int x = BytesPerPixel;
+                        var x = BytesPerPixel;
 
                         target += BytesPerPixel;
                         byte* rawm = raw + BytesPerPixel, rawBpp = raw;
@@ -176,7 +168,7 @@ namespace Pingu.Benchmarks
                         }
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     byte* rawm = raw, prev = previous, rawBpp = raw - BytesPerPixel;
 
                     unchecked {
@@ -214,12 +206,10 @@ namespace Pingu.Benchmarks
             // 8-byte division, but S.N.V lacks unpack/shift instructions, so we can't implement this now. This
             // benchmark left in for completeness sake/hope that SNV will sprout unpack/shift someday and we can
             // implement fast vector division.
-            int targetOffset = 0;
-
             fixed (byte* targetUnoffset = TargetBuffer)
             fixed (byte* raw = RawScanline)
             fixed (byte* previous = PreviousScanline) {
-                byte* target = targetUnoffset + targetOffset;
+                var target = targetUnoffset + TargetOffset;
 
                 if (previous == null) {
                     Buffer.MemoryCopy(raw, target, BytesPerPixel, BytesPerPixel);
@@ -228,17 +218,17 @@ namespace Pingu.Benchmarks
                     var chunks = (int)((float)(length - BytesPerPixel) / vecSize);
                     var twos = new Vector<byte>(2);
 
-                    for (int i = 0; i < chunks; i++) {
-                        int src = i * vecSize, dst = src + BytesPerPixel + targetOffset;
-                        var vec = new Vector<byte>(RawScanline, dst) - Vector.Divide(new Vector<byte>(RawScanline, src), twos);
+                    for (var i = 0; i < chunks; i++) {
+                        int src = i * vecSize, dst = src + BytesPerPixel + TargetOffset;
+                        var vec = new Vector<byte>(RawScanline, dst) - new Vector<byte>(RawScanline, src) / twos;
                         vec.CopyTo(TargetBuffer, dst);
                     }
 
-                    int start = BytesPerPixel + (vecSize * chunks);
-                    for (int i = start; i < RawScanline.Length; i++)
+                    var start = BytesPerPixel + (vecSize * chunks);
+                    for (var i = start; i < RawScanline.Length; i++)
                         target[i] = unchecked((byte)(raw[i] - raw[i - BytesPerPixel] / 2));
                 } else {
-                    int i = 0;
+                    var i = 0;
                     for (; i < BytesPerPixel; i++)
                         target[i] = unchecked((byte)(raw[i] - previous[i] / 2));
                     for (; RawScanline.Length - i > 8; i += 8) {

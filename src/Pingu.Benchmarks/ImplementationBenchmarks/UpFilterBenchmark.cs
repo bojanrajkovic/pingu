@@ -12,7 +12,7 @@ namespace Pingu.Benchmarks.ImplementationBenchmarks
         const int TotalBytes = 5000;
         byte[] targetBuffer, rawScanline, previousScanline;
 
-        static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
+        static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
         [GlobalSetup]
         public void Setup()
@@ -20,8 +20,8 @@ namespace Pingu.Benchmarks.ImplementationBenchmarks
             targetBuffer = new byte[TotalBytes];
             rawScanline = new byte[TotalBytes];
             previousScanline = new byte[TotalBytes];
-            rng.GetBytes(rawScanline);
-            rng.GetBytes(previousScanline);
+            Rng.GetBytes(rawScanline);
+            Rng.GetBytes(previousScanline);
         }
 
         [Benchmark(Baseline = true)]

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
@@ -10,22 +9,11 @@ namespace Pingu.Benchmarks
     [OrderProvider(SummaryOrderPolicy.FastestToSlowest)]
     public class Adler32Implementations
     {
-        Random rand = new Random();
-        byte[] data = new byte[5000];
+        readonly Random rand = new Random();
+        readonly byte[] data = new byte[5000];
 
         [GlobalSetup]
         public void SetupData() => rand.NextBytes(data);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do16(byte* buf, ref uint a, ref uint b) { Do8(buf, 0, ref a, ref b); Do8(buf, 8, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do8(byte* buf, int i, ref uint a, ref uint b) { Do4(buf, i, ref a, ref b); Do4(buf, i + 4, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do4(byte* buf, int i, ref uint a, ref uint b) { Do2(buf, i, ref a, ref b); Do2(buf, i + 2, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do2(byte* buf, int i, ref uint a, ref uint b) { Do1(buf, i, ref a, ref b); Do1(buf, i + 1, ref a, ref b); }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        unsafe void Do1(byte* buf, int i, ref uint a, ref uint b) { a += buf[i]; b += a; }
 
         [Benchmark]
         public unsafe int Smartest()
@@ -34,13 +22,46 @@ namespace Pingu.Benchmarks
             const int nmax = 5552;
 
             fixed (byte* ptr = data) {
-                byte* buf = ptr;
-                int len = data.Length, k;
+                var buf = ptr;
+                var len = data.Length;
                 while (len > 0) {
-                    k = len < nmax ? (int)len : nmax;
+                    var k = len < nmax ? len : nmax;
                     len -= k;
                     while (k >= 16) {
-                        Do16(buf, ref a, ref b);
+                        // This is a hand-unrolled 16 byte loop. Do not touch.
+                        a += buf[0];
+                        b += a;
+                        a += buf[1];
+                        b += a;
+                        a += buf[2];
+                        b += a;
+                        a += buf[3];
+                        b += a;
+                        a += buf[4];
+                        b += a;
+                        a += buf[5];
+                        b += a;
+                        a += buf[6];
+                        b += a;
+                        a += buf[7];
+                        b += a;
+                        a += buf[8];
+                        b += a;
+                        a += buf[9];
+                        b += a;
+                        a += buf[10];
+                        b += a;
+                        a += buf[11];
+                        b += a;
+                        a += buf[12];
+                        b += a;
+                        a += buf[13];
+                        b += a;
+                        a += buf[14];
+                        b += a;
+                        a += buf[15];
+                        b += a;
+                        // End hand-unrolled loop.
                         buf += 16;
                         k -= 16;
                     }
@@ -67,7 +88,7 @@ namespace Pingu.Benchmarks
                 byte* buf = ptr;
                 int len = data.Length, k;
                 while (len > 0) {
-                    k = len < nmax ? (int)len : nmax;
+                    k = len < nmax ? len : nmax;
                     len -= k;
                     if (k != 0) {
                         do {
@@ -102,7 +123,9 @@ namespace Pingu.Benchmarks
         {
             uint a = 1, b = 0;
 
+            // ReSharper disable ForCanBeConvertedToForeach
             for (var i = 0; i < data.Length; i++) {
+            // ReSharper restore ForCanBeConvertedToForeach
                 a = (a + data[i]) % 65521;
                 b = (b + a) % 65521;
             }

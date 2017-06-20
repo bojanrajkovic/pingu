@@ -15,12 +15,12 @@ namespace Pingu.Benchmarks
         [Params(5000)]
         public int FloatsToFloor { get; set; }
 
-        Random r = new Random();
+        readonly Random r = new Random();
 
         static float NextFloat(Random random)
         {
-            double mantissa = (random.NextDouble() * 2.0) - 1.0;
-            double exponent = System.Math.Pow(2.0, random.Next(0, 128));
+            double mantissa = random.NextDouble() * 2.0 - 1.0,
+                   exponent = System.Math.Pow(2.0, random.Next(0, 128));
             return (float)(mantissa * exponent);
         }
 
@@ -30,14 +30,14 @@ namespace Pingu.Benchmarks
             FloorData = new float[FloatsToFloor];
             FlooredData = new int[FloatsToFloor];
 
-            for (int i = 0; i < FloatsToFloor; i++)
+            for (var i = 0; i < FloatsToFloor; i++)
                 FloorData[i] = NextFloat(r);
         }
 
         [Benchmark(Baseline = true)]
         public void MathFloor()
         {
-            for (int i = 0; i < FloatsToFloor; i++)
+            for (var i = 0; i < FloatsToFloor; i++)
                 FlooredData[i] = (int) System.Math.Floor(FloorData[i]);
         }
 
@@ -45,7 +45,7 @@ namespace Pingu.Benchmarks
         public void FastFloor()
         {
             // We know our data fits in the range of an int...
-            for (int i = 0; i < FloatsToFloor; i++)
+            for (var i = 0; i < FloatsToFloor; i++)
                 FlooredData[i] = (int)FloorData[i];
         }
     }

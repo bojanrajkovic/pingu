@@ -12,7 +12,7 @@ namespace Pingu.Benchmarks.ImplementationBenchmarks
         const int TotalBytes = 5000;
         byte[] targetBuffer, rawScanline, previousScanline;
 
-        static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
+        static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
         [Params(3, 4)]
         public int BytesPerPixel { get; set; }
@@ -23,22 +23,22 @@ namespace Pingu.Benchmarks.ImplementationBenchmarks
             targetBuffer = new byte[TotalBytes];
             rawScanline = new byte[TotalBytes];
             previousScanline = new byte[TotalBytes];
-            rng.GetBytes(rawScanline);
-            rng.GetBytes(previousScanline);
+            Rng.GetBytes(rawScanline);
+            Rng.GetBytes(previousScanline);
         }
 
         [Benchmark(Baseline = true)]
         public void PinguSubFilterVectors()
         {
             var filter = Filters.SubFilter.Instance;
-            filter.VectorAndPointerFilterInto(targetBuffer, 0, rawScanline, previousScanline, BytesPerPixel);
+            filter.VectorAndPointerFilterInto(targetBuffer, 0, rawScanline, BytesPerPixel);
         }
 
         [Benchmark]
         public void PinguSubFilterPointers()
         {
             var filter = Filters.SubFilter.Instance;
-            filter.UnrolledPointerFilterInto(targetBuffer, 0, rawScanline, previousScanline, BytesPerPixel);
+            filter.UnrolledPointerFilterInto(targetBuffer, 0, rawScanline, BytesPerPixel);
         }
     }
 }
