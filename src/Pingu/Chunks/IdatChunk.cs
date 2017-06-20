@@ -14,8 +14,10 @@ namespace Pingu.Chunks
     public class IdatChunk : Chunk
     {
         int compressedLength;
-        byte[] rawRgbData, compressedData;
-        IhdrChunk imageInfo;
+        byte[] compressedData;
+
+        readonly byte[] rawRgbData;
+        readonly IhdrChunk imageInfo;
 
         public override string Name => "IDAT";
         public override int Length => compressedLength;
@@ -88,7 +90,7 @@ namespace Pingu.Chunks
                 FilterInto(scanlineToWrite, 1, scanline, previousScanline, pixelWidth);
 
                 // Write scanline to stream.
-                await tempStream.WriteAsync(scanlineToWrite, 0, scanlineToWrite.Length);
+                await tempStream.WriteAsync(scanlineToWrite, 0, scanlineToWrite.Length).ConfigureAwait(false);
 
                 // Allocate previous scanline if needed.
                 previousScanline = previousScanline ?? new byte[scanline.Length];
@@ -99,7 +101,7 @@ namespace Pingu.Chunks
 
             var data = tempStream.ToArray();
             adler.FeedBlock(data);
-            await deflateStream.WriteAsync(data, 0, data.Length);
+            await deflateStream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
 
             tempStream.Dispose();
             deflateStream.Dispose();

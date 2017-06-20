@@ -10,8 +10,8 @@ namespace Pingu
 
     public class PngFile : IEnumerable<Chunk>
     {
-        List<Chunk> chunksToWrite = new List<Chunk>();
-        static readonly byte[] magic = new byte[] { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+        readonly List<Chunk> chunksToWrite = new List<Chunk>();
+        static readonly byte[] Magic = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 
         public void Add(Chunk chunk) => chunksToWrite.Add(chunk);
 
@@ -22,9 +22,9 @@ namespace Pingu
 
         public async Task WriteFileAsync(Stream target)
         {
-            await target.WriteAsync(magic, 0, magic.Length);
+            await target.WriteAsync(Magic, 0, Magic.Length).ConfigureAwait(false);
             foreach (var chunk in this)
-                await chunk.WriteSelfToStreamAsync(target);
+                await chunk.WriteSelfToStreamAsync(target).ConfigureAwait(false);
         }
     }
 }

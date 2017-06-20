@@ -5,12 +5,14 @@ namespace Pingu.Colors
 {
     public class Pallette
     {
-        int[] palletteEntries;
-        Dictionary<int, int> reversePallette;
+        readonly int[] palletteEntries;
+        readonly Dictionary<int, int> reversePallette;
 
-        int currentPalletteEntry = 0;
+        int currentPalletteEntry;
 
+        // ReSharper disable MemberCanBePrivate.Global
         public int PalletteSize { get; }
+        // ReSharper restore MemberCanBePrivate.Global
 
         public Pallette(int bitDepth)
         {
@@ -23,7 +25,7 @@ namespace Pingu.Colors
         internal int AddColorToPallette(byte r, byte g, byte b)
         {
             if (currentPalletteEntry == PalletteSize)
-                throw new Exception($"Pallette is at capacity, increase bit depth for the image.");
+                throw new Exception("Pallette is at capacity, increase bit depth for the image.");
 
             int color = ColorHelpers.PackRgb(r, g, b);
             palletteEntries[currentPalletteEntry] = color;
@@ -31,8 +33,6 @@ namespace Pingu.Colors
 
             return currentPalletteEntry++;
         }
-
-        internal int GetPackedColor(int i) => palletteEntries[i];
 
         public byte[] this[int i] => ColorHelpers.UnpackRgb(palletteEntries[i]);
 

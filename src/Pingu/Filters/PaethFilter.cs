@@ -7,12 +7,12 @@ namespace Pingu.Filters
 {
     class PaethFilter : IFilter
     {
-        private static readonly Lazy<PaethFilter> lazy
+        static readonly Lazy<PaethFilter> Lazy
             = new Lazy<PaethFilter>(() => new PaethFilter());
 
-        public static PaethFilter Instance => lazy.Value;
+        public static PaethFilter Instance => Lazy.Value;
 
-        internal PaethFilter() { }
+        PaethFilter() { }
 
         public FilterType Type => FilterType.Paeth;
 
@@ -32,13 +32,13 @@ namespace Pingu.Filters
             fixed (byte* targetPreoffset = targetBuffer)
             fixed (byte* previous = previousScanline)
             fixed (byte* raw = rawScanline) {
-                byte* target = targetPreoffset + targetOffset;
+                var target = targetPreoffset + targetOffset;
                 if (previous == null) {
                     // When the previous scanline is null, Paeth becomes Sub. Delegate to our very fast Sub implementation,
                     // which is either vectorized or unrolled.
                     SubFilter.Instance.FilterInto(targetBuffer, targetOffset, rawScanline, previousScanline, bytesPerPixel);
                 } else {
-                    int i = 0;
+                    var i = 0;
                     unchecked {
                         byte* tgt = target, rawm = raw, prev = previous,
                               rawBpp = raw - bytesPerPixel, prevBpp = previous - bytesPerPixel;

@@ -4,12 +4,12 @@ namespace Pingu.Filters
 {
     class NullFilter : IFilter
     {
-        private static readonly Lazy<NullFilter> lazy
+        static readonly Lazy<NullFilter> Lazy
             = new Lazy<NullFilter>(() => new NullFilter());
 
-        public static NullFilter Instance => lazy.Value;
+        public static NullFilter Instance => Lazy.Value;
 
-        internal NullFilter() { }
+        NullFilter() { }
 
         public FilterType Type => FilterType.None;
 

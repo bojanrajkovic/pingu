@@ -4,12 +4,12 @@ namespace Pingu.Filters
 {
     class AvgFilter : IFilter
     {
-        private static readonly Lazy<AvgFilter> lazy
+        static readonly Lazy<AvgFilter> Lazy
             = new Lazy<AvgFilter>(() => new AvgFilter());
 
-        public static AvgFilter Instance => lazy.Value;
+        public static AvgFilter Instance => Lazy.Value;
 
-        internal AvgFilter() { }
+        AvgFilter() { }
 
         public FilterType Type => FilterType.Average;
 
@@ -29,7 +29,7 @@ namespace Pingu.Filters
                     // Basically Sub, but with the Raw(x-bpp) value divided by 2
                     Buffer.MemoryCopy(raw, target, rawScanline.Length, bytesPerPixel);
                     unchecked {
-                        int x = bytesPerPixel;
+                        var x = bytesPerPixel;
                         target += bytesPerPixel;
                         byte* rawm = raw + bytesPerPixel, rawBpp = raw;
 
@@ -51,7 +51,7 @@ namespace Pingu.Filters
                         }
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     byte* rawm = raw, prev = previous, rawBpp = raw - bytesPerPixel;
 
                     unchecked {

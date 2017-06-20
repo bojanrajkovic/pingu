@@ -88,7 +88,7 @@ namespace Pingu.Checksums
             int read;
             byte[] buf = new byte[8192];
 
-            while ((read = await data.ReadAsync(buf, 0, buf.Length)) > 0)
+            while ((read = await data.ReadAsync(buf, 0, buf.Length).ConfigureAwait(false)) > 0)
                 adler.FeedBlock(buf, 0, read);
 
             return adler.Hash;
