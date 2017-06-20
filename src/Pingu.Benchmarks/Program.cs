@@ -82,7 +82,7 @@ class Program
 
     static void TestPaeth()
     {
-        var paeth = new PaethImplementations { TotalBytes = 5000, HasPreviousScanline = true, BytesPerPixel = 4 };
+        var paeth = new PaethImplementations { TotalBytes = 5000, HasPreviousScanline = true };
         byte[] naiveMath = new byte[paeth.TotalBytes], naiveFast = new byte[paeth.TotalBytes],
                naiveVec = new byte[paeth.TotalBytes], unrolledMath = new byte[paeth.TotalBytes],
                unrolledFast = new byte[paeth.TotalBytes], unrolledVec = new byte[paeth.TotalBytes],
@@ -163,7 +163,7 @@ class Program
 
     static void TestAvg()
     {
-        var avg = new AvgImplementations { TotalBytes = 5000, BytesPerPixel = 4, HasPreviousScanline = true };
+        var avg = new AvgImplementations { TotalBytes = 5000, HasPreviousScanline = true };
         byte[] naive = new byte[avg.TotalBytes], naiveLoops = new byte[avg.TotalBytes], pointer = new byte[avg.TotalBytes],
                unrolled = new byte[avg.TotalBytes], vec = new byte[avg.TotalBytes], motion = new byte [avg.TotalBytes];
 
@@ -196,7 +196,7 @@ class Program
 
     static void TestSub()
     {
-        var sub = new SubImplementations { BytesPerPixel = 4, TotalBytes = 8 };
+        var sub = new SubImplementations { TotalBytes = 8 };
         byte[] naive = new byte[sub.TotalBytes], pointer = new byte[sub.TotalBytes], unrolled = new byte[sub.TotalBytes],
                preoffset = new byte[sub.TotalBytes], vec = new byte[sub.TotalBytes], motion = new byte[sub.TotalBytes];
 
@@ -232,8 +232,8 @@ class Program
         var crc32 = new Crc32Implementations() { TotalBytes = 5000 };
         crc32.Setup();
 
-        var ours = (uint)crc32.MyCRC32();
-        var corefx = crc32.CoreFxCRC32();
+        var ours = (uint)crc32.MyCrc32();
+        var corefx = crc32.CoreFxCrc32();
 
         Console.WriteLine($"Ours: {ours} - CoreFX: {corefx}");
     }

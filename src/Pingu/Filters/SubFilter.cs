@@ -6,12 +6,12 @@ namespace Pingu.Filters
 {
     class SubFilter : IFilter
     {
-        private static readonly Lazy<SubFilter> lazy
+        static readonly Lazy<SubFilter> Lazy
             = new Lazy<SubFilter>(() => new SubFilter());
 
-        public static SubFilter Instance => lazy.Value;
+        public static SubFilter Instance => Lazy.Value;
 
-        internal SubFilter () { }
+        SubFilter () { }
 
         public FilterType Type => FilterType.Sub;
 
@@ -19,7 +19,6 @@ namespace Pingu.Filters
             byte[] targetBuffer,
             int targetOffset,
             byte[] rawScanline,
-            byte[] previousScanline,
             int bytesPerPixel)
         {
             fixed (byte* targetPreoffset = targetBuffer)
@@ -60,7 +59,6 @@ namespace Pingu.Filters
             byte[] targetBuffer,
             int targetOffset,
             byte[] scanline,
-            byte[] previousScanline,
             int bytesPerPixel)
         {
             int vecSize = Vector<byte>.Count, length = scanline.Length;
@@ -70,20 +68,20 @@ namespace Pingu.Filters
             fixed (byte* resultPtr = targetBuffer) {
                 Buffer.MemoryCopy(dataPtr, resultPtr + targetOffset, length, bytesPerPixel);
 
-                for (int i = 0; i < chunks; i++) {
+                for (var i = 0; i < chunks; i++) {
                     int src = i * vecSize, dst = src + bytesPerPixel;
                     var vec = new Vector<byte>(scanline, dst) - new Vector<byte>(scanline, src);
                     vec.CopyTo(targetBuffer, dst + targetOffset);
                 }
 
-                int start = bytesPerPixel + (vecSize * chunks);
-                for (int i = start; i < length; i++)
+                var start = bytesPerPixel + vecSize * chunks;
+                for (var i = start; i < length; i++)
                     resultPtr[i+targetOffset] = unchecked((byte)(dataPtr[i] - dataPtr[i - bytesPerPixel]));
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void FilterInto(
+        public void FilterInto(
             byte[] targetBuffer,
             int targetOffset,
             byte[] scanline,
@@ -93,9 +91,9 @@ namespace Pingu.Filters
             // This is not a performance issue--the JITter will treat a `static readonly bool` as a constant
             // and will do DCE to eliminate the wrong branch here.
             if (DefaultFilters.UseVectors)
-                VectorAndPointerFilterInto(targetBuffer, targetOffset, scanline, previousScanline, bytesPerPixel);
+                VectorAndPointerFilterInto(targetBuffer, targetOffset, scanline, bytesPerPixel);
             else
-                UnrolledPointerFilterInto(targetBuffer, targetOffset, scanline, previousScanline, bytesPerPixel);
+                UnrolledPointerFilterInto(targetBuffer, targetOffset, scanline, bytesPerPixel);
         }
     }
 }

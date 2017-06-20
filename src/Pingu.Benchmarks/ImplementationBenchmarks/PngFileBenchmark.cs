@@ -1,8 +1,11 @@
-﻿using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
+
 using Pingu.Chunks;
 using Pingu.Colors;
 using Pingu.Filters;
@@ -31,7 +34,8 @@ namespace Pingu.Benchmarks.ImplementationBenchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public async Task CreatePNGFile()
+        [SuppressMessage("ReSharper", "ConsiderUsingAsyncSuffix")]
+        public async Task CreatePngFile()
         {
             var header = new IhdrChunk(752, 1334, 8, ColorType.TruecolorAlpha);
             var idat = new IdatChunk(header, rawRgbaData, FilterType);

@@ -15,20 +15,20 @@ namespace Pingu.Benchmarks
 
         public byte[] Data { get; set; }
 
-        static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
+        static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
         [GlobalSetup]
         public void Setup()
         {
             Data = new byte[TotalBytes];
-            rng.GetBytes(Data);
+            Rng.GetBytes(Data);
         }
 
         [Benchmark(Baseline = true)]
         public unsafe int ByteByByte()
         {
             fixed (byte* ptr = Data) {
-                int sum = 0;
+                var sum = 0;
                 for (var i = 0; i < TotalBytes; i++) {
                     var val = ptr[i];
                     sum += val < 128 ? val : 256 - val;
@@ -38,9 +38,9 @@ namespace Pingu.Benchmarks
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        int Abs(int value)
+        static int Abs(int value)
         {
-            int temp = value >> 31;
+            var temp = value >> 31;
             value ^= temp;
             value += temp & 1;
             return value;
@@ -49,10 +49,10 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe int SignedBytesByByteFastAbs()
         {
-            int sum = 0;
+            var sum = 0;
             unchecked {
                 fixed (byte* ptr = Data) {
-                    sbyte* sb = (sbyte*) ptr;
+                    var sb = (sbyte*) ptr;
                     for (var i = 0; i < TotalBytes; i++)
                         sum += Abs(sb[i]);
                 }
@@ -66,7 +66,7 @@ namespace Pingu.Benchmarks
             int sum = 0, len = TotalBytes;
             unchecked {
                 fixed (byte* ptr = Data) {
-                    sbyte* sb = (sbyte*)ptr;
+                    var sb = (sbyte*)ptr;
                     for (; len >= 8; len -= 8, sb += 8)
                         sum += Abs(sb[0]) + Abs(sb[1]) + Abs(sb[2]) + Abs(sb[3]) +
                                Abs(sb[4]) + Abs(sb[5]) + Abs(sb[6]) + Abs(sb[7]);
@@ -83,7 +83,7 @@ namespace Pingu.Benchmarks
             int sum = 0, len = TotalBytes;
             unchecked {
                 fixed (byte* ptr = Data) {
-                    sbyte* sb = (sbyte*)ptr;
+                    var sb = (sbyte*)ptr;
                     for (; len >= 16; len -= 16, sb += 16)
                         sum += Abs(sb[0]) + Abs(sb[1]) + Abs(sb[2]) + Abs(sb[3]) +
                                Abs(sb[4]) + Abs(sb[5]) + Abs(sb[6]) + Abs(sb[7]) +

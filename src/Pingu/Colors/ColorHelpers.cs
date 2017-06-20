@@ -10,7 +10,7 @@ namespace Pingu.Colors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static byte[] UnpackRgb (int color)
         {
-            return new byte[] {
+            return new [] {
                 (byte)(color >> 16),
                 (byte)((color >> 8) & 0xff),
                 (byte)(color & 0xff)

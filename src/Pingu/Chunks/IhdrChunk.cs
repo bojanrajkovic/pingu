@@ -30,10 +30,10 @@ namespace Pingu.Chunks
         // Our IHDR chunk will only have 3 fungible values, the rest are going to be hard-coded.
         public IhdrChunk(int width, int height, int bitDepth, ColorType colorType)
         {
-            if (width <= 0 || width > int.MaxValue)
+            if (width <= 0)
                 throw new ArgumentOutOfRangeException(nameof(width), "Width must be within the range of 1 to 2^31-1.");
 
-            if (height <= 0 || height > int.MaxValue)
+            if (height <= 0)
                 throw new ArgumentOutOfRangeException(nameof(height), "Height must be within the range of 1 to 2^31-1.");
 
             if (!Enum.IsDefined (typeof (ColorType), colorType))

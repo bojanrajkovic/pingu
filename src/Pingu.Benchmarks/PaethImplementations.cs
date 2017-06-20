@@ -15,15 +15,15 @@ namespace Pingu.Benchmarks
         [Params(5000)]
         public int TotalBytes { get; set; }
 
-        public bool HasPreviousScanline { get; set; } = true;
+        public bool HasPreviousScanline { private get; set; } = true;
 
-        [Params(4)]
-        public int BytesPerPixel { get; set; }
+        const int BytesPerPixel = 4;
+        const int TargetOffset = 0;
 
-        public byte[] TargetBuffer { get; set; }
-        public byte[] RawScanline { get; set; }
-        public byte[] PreviousScanline { get; set; }
-        static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
+        public byte[] TargetBuffer { get; private set; }
+        public byte[] RawScanline { get; private set; }
+        public byte[] PreviousScanline { get; private set; }
+        static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
         [GlobalSetup]
         public void Setup()
@@ -32,30 +32,31 @@ namespace Pingu.Benchmarks
             RawScanline = new byte[TotalBytes];
             PreviousScanline = HasPreviousScanline ? new byte[TotalBytes] : null;
 
-            rng.GetBytes(RawScanline);
+            Rng.GetBytes(RawScanline);
 
             if (HasPreviousScanline)
-                rng.GetBytes(PreviousScanline);
+                // ReSharper disable once AssignNullToNotNullAttribute
+                Rng.GetBytes(PreviousScanline);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        int Abs(int value)
+        static int Abs(int value)
         {
-            int temp = value >> 31;
+            var temp = value >> 31;
             value ^= temp;
             value += temp & 1;
             return value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        int FasterAbs(int value)
+        static int FasterAbs(int value)
         {
-            int mask = value >> 31;
+            var mask = value >> 31;
             return (value ^ mask) - mask;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        byte PaethFastAbs(byte a, byte b, byte c)
+        static byte PaethFastAbs(byte a, byte b, byte c)
         {
             int p = a + b - c,
                 pa = Abs(p - a),
@@ -66,7 +67,7 @@ namespace Pingu.Benchmarks
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        byte PaethFasterAbs(byte a, byte b, byte c)
+        static byte PaethFasterAbs(byte a, byte b, byte c)
         {
             int p = a + b - c,
                 pa = FasterAbs(p - a),
@@ -77,7 +78,7 @@ namespace Pingu.Benchmarks
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        byte PaethFasterAbsLessArithmetic(byte a, byte b, byte c)
+        static byte PaethFasterAbsLessArithmetic(byte a, byte b, byte c)
         {
             int pc = c, pa = b - pc, pb = a - pc;
             pc = FasterAbs(pa + pb);
@@ -88,15 +89,15 @@ namespace Pingu.Benchmarks
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        byte PaethVec(byte a, byte b, byte c)
+        static byte PaethVec(byte a, byte b, byte c)
         {
-            int p = a + b - c;
+            var p = a + b - c;
             var resVec = Vector3.Abs(new Vector3(p, p, p) - new Vector3(a, b, c));
             return resVec.X <= resVec.Y && resVec.X <= resVec.Z ? a : (resVec.Y <= resVec.Z ? b : c);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        byte Paeth(byte a, byte b, byte c)
+        static byte Paeth(byte a, byte b, byte c)
         {
             int p = a + b - c,
                 pa = Math.Abs(p - a),
@@ -113,24 +114,23 @@ namespace Pingu.Benchmarks
         public void NaiveWithMathAbs()
         {
             // Paeth(x) = Raw(x) - PaethPredictor(Raw(x-bpp), Prior(x), Prior(x - bpp))
-            int targetOffset = 0;
 
             if (PreviousScanline == null) {
                 // First bpp bytes, a and c values passed to the Paeth predictor are 0. If previous scanline is null,
                 // then the first 4 bytes just match the first 4 raw, as Paeth(0,0,0) is 0.
-                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, targetOffset, BytesPerPixel);
+                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, TargetOffset, BytesPerPixel);
                 // For the remaining bytes, we have a value for a, but not b and c, as there is no prior scanline.
                 // Paeth(a,0,0) is a, so Paeth is just the sub filter in this case.
                 for (var i = BytesPerPixel; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel]));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel]));
             } else {
-                int i = 0;
+                var i = 0;
                 // First BPP bytes, a and c are 0, but b has a value. Paeth(0,b,0) == b, so treat it as such.
                 for (; i < BytesPerPixel; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i]));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i]));
                 // The remaining bytes, a and c have values!
                 for (; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - Paeth(
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - Paeth(
                         RawScanline[i - BytesPerPixel],
                         PreviousScanline[i],
                         PreviousScanline[i - BytesPerPixel]
@@ -141,12 +141,10 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void UnrolledWithMathAbs()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetPreoffset = TargetBuffer)
             fixed (byte* previous = PreviousScanline)
             fixed (byte* raw = RawScanline) {
-                byte* target = targetPreoffset + targetOffset;
+                var target = targetPreoffset + TargetOffset;
                 if (previous == null) {
                     // If the previous scanline is null, Paeth == Sub
                     Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
@@ -155,7 +153,7 @@ namespace Pingu.Benchmarks
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                         // the loop a bit, as well.
-                        int x = BytesPerPixel;
+                        var x = BytesPerPixel;
                         for (; RawScanline.Length - x > 8; x += 8) {
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                             target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
@@ -171,7 +169,7 @@ namespace Pingu.Benchmarks
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     unchecked {
                         // The first bpp bytes, Paeth = Up
                         for (; i < BytesPerPixel; i++)
@@ -200,24 +198,23 @@ namespace Pingu.Benchmarks
         public void NaiveWithFastAbs()
         {
             // Paeth(x) = Raw(x) - PaethPredictor(Raw(x-bpp), Prior(x), Prior(x - bpp))
-            int targetOffset = 0;
 
             if (PreviousScanline == null) {
                 // First bpp bytes, a and c values passed to the Paeth predictor are 0. If previous scanline is null,
                 // then the first 4 bytes just match the first 4 raw, as Paeth(0,0,0) is 0.
-                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, targetOffset, BytesPerPixel);
+                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, TargetOffset, BytesPerPixel);
                 // For the remaining bytes, we have a value for a, but not b and c, as there is no prior scanline.
                 // Paeth(a,0,0) is a, so Paeth is just the sub filter in this case.
                 for (var i = BytesPerPixel; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel]));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel]));
             } else {
-                int i = 0;
+                var i = 0;
                 // First BPP bytes, a and c are 0, but b has a value. Paeth(0,b,0) == b, so treat it as such.
                 for (; i < BytesPerPixel; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i]));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i]));
                 // The remaining bytes, a and c have values!
                 for (; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - PaethFastAbs(
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - PaethFastAbs(
                         RawScanline[i - BytesPerPixel],
                         PreviousScanline[i],
                         PreviousScanline[i - BytesPerPixel]
@@ -228,12 +225,10 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void UnrolledWithFastAbs()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetPreoffset = TargetBuffer)
             fixed (byte* previous = PreviousScanline)
             fixed (byte* raw = RawScanline) {
-                byte* target = targetPreoffset + targetOffset;
+                var target = targetPreoffset + TargetOffset;
                 if (previous == null) {
                     // If the previous scanline is null, Paeth == Sub
                     Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
@@ -242,7 +237,7 @@ namespace Pingu.Benchmarks
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                         // the loop a bit, as well.
-                        int x = BytesPerPixel;
+                        var x = BytesPerPixel;
                         for (; RawScanline.Length - x > 8; x += 8) {
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                             target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
@@ -258,7 +253,7 @@ namespace Pingu.Benchmarks
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     unchecked {
                         // The first bpp bytes, Paeth = Up
                         for (; i < BytesPerPixel; i++)
@@ -286,12 +281,10 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void UnrolledWithFastAbsAndMovingPointers()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetPreoffset = TargetBuffer)
             fixed (byte* previous = PreviousScanline)
             fixed (byte* raw = RawScanline) {
-                byte* target = targetPreoffset + targetOffset;
+                var target = targetPreoffset + TargetOffset;
                 if (previous == null) {
                     // If the previous scanline is null, Paeth == Sub
                     Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
@@ -300,7 +293,7 @@ namespace Pingu.Benchmarks
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                         // the loop a bit, as well.
-                        int x = BytesPerPixel;
+                        var x = BytesPerPixel;
                         for (; RawScanline.Length - x > 8; x += 8) {
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                             target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
@@ -316,7 +309,7 @@ namespace Pingu.Benchmarks
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     unchecked {
                         byte* tgt = target, rawm = raw, prev = previous,
                               rawBpp = raw - BytesPerPixel, prevBpp = previous - BytesPerPixel;
@@ -352,12 +345,10 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void UnrolledWithFasterAbsAndMovingPointers()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetPreoffset = TargetBuffer)
             fixed (byte* previous = PreviousScanline)
             fixed (byte* raw = RawScanline) {
-                byte* target = targetPreoffset + targetOffset;
+                var target = targetPreoffset + TargetOffset;
                 if (previous == null) {
                     // If the previous scanline is null, Paeth == Sub
                     Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
@@ -366,7 +357,7 @@ namespace Pingu.Benchmarks
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                         // the loop a bit, as well.
-                        int x = BytesPerPixel;
+                        var x = BytesPerPixel;
                         for (; RawScanline.Length - x > 8; x += 8) {
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                             target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
@@ -382,7 +373,7 @@ namespace Pingu.Benchmarks
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     unchecked {
                         byte* tgt = target, rawm = raw, prev = previous,
                               rawBpp = raw - BytesPerPixel, prevBpp = previous - BytesPerPixel;
@@ -418,12 +409,10 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void UnrolledWithFasterAbsLessArithmeticAndMovingPointers()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetPreoffset = TargetBuffer)
             fixed (byte* previous = PreviousScanline)
             fixed (byte* raw = RawScanline) {
-                byte* target = targetPreoffset + targetOffset;
+                var target = targetPreoffset + TargetOffset;
                 if (previous == null) {
                     // If the previous scanline is null, Paeth == Sub
                     Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
@@ -432,7 +421,7 @@ namespace Pingu.Benchmarks
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                         // the loop a bit, as well.
-                        int x = BytesPerPixel;
+                        var x = BytesPerPixel;
                         for (; RawScanline.Length - x > 8; x += 8) {
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                             target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
@@ -448,7 +437,7 @@ namespace Pingu.Benchmarks
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     unchecked {
                         byte* tgt = target, rawm = raw, prev = previous,
                               rawBpp = raw - BytesPerPixel, prevBpp = previous - BytesPerPixel;
@@ -485,24 +474,22 @@ namespace Pingu.Benchmarks
         public void NaiveWithVecAbs()
         {
             // Paeth(x) = Raw(x) - PaethPredictor(Raw(x-bpp), Prior(x), Prior(x - bpp))
-            int targetOffset = 0;
-
             if (PreviousScanline == null) {
                 // First bpp bytes, a and c values passed to the Paeth predictor are 0. If previous scanline is null,
                 // then the first 4 bytes just match the first 4 raw, as Paeth(0,0,0) is 0.
-                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, targetOffset, BytesPerPixel);
+                Buffer.BlockCopy(RawScanline, 0, TargetBuffer, TargetOffset, BytesPerPixel);
                 // For the remaining bytes, we have a value for a, but not b and c, as there is no prior scanline.
                 // Paeth(a,0,0) is a, so Paeth is just the sub filter in this case.
                 for (var i = BytesPerPixel; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel]));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - RawScanline[i - BytesPerPixel]));
             } else {
-                int i = 0;
+                var i = 0;
                 // First BPP bytes, a and c are 0, but b has a value. Paeth(0,b,0) == b, so treat it as such.
                 for (; i < BytesPerPixel; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i]));
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - PreviousScanline[i]));
                 // The remaining bytes, a and c have values!
                 for (; i < RawScanline.Length; i++)
-                    TargetBuffer[i + targetOffset] = unchecked((byte)(RawScanline[i] - PaethVec(
+                    TargetBuffer[i + TargetOffset] = unchecked((byte)(RawScanline[i] - PaethVec(
                         RawScanline[i - BytesPerPixel],
                         PreviousScanline[i],
                         PreviousScanline[i - BytesPerPixel]
@@ -513,12 +500,10 @@ namespace Pingu.Benchmarks
         [Benchmark]
         public unsafe void UnrolledWithVecAbs()
         {
-            int targetOffset = 0;
-
             fixed (byte* targetPreoffset = TargetBuffer)
             fixed (byte* previous = PreviousScanline)
             fixed (byte* raw = RawScanline) {
-                byte* target = targetPreoffset + targetOffset;
+                var target = targetPreoffset + TargetOffset;
                 if (previous == null) {
                     // If the previous scanline is null, Paeth == Sub
                     Buffer.MemoryCopy(raw, target, RawScanline.Length, BytesPerPixel);
@@ -527,7 +512,7 @@ namespace Pingu.Benchmarks
                         // We start immediately after the first pixel--its bytes are unchanged. We only copied
                         // bytesPerPixel bytes from the scanline, so we need to read over the raw scanline. Unroll
                         // the loop a bit, as well.
-                        int x = BytesPerPixel;
+                        var x = BytesPerPixel;
                         for (; RawScanline.Length - x > 8; x += 8) {
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                             target[x + 1] = (byte)(raw[x + 1] - raw[x + 1 - BytesPerPixel]);
@@ -543,7 +528,7 @@ namespace Pingu.Benchmarks
                             target[x] = (byte)(raw[x] - raw[x - BytesPerPixel]);
                     }
                 } else {
-                    int i = 0;
+                    var i = 0;
                     unchecked {
                         // The first bpp bytes, Paeth = Up
                         for (; i < BytesPerPixel; i++)

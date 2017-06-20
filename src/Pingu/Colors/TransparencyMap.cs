@@ -4,9 +4,11 @@ namespace Pingu.Colors
 {
     public class TransparencyMap
     {
-        byte[] transparencyMapEntries;
+        readonly byte[] transparencyMapEntries;
 
+        // ReSharper disable MemberCanBePrivate.Global
         public int TransparencyMapSize { get; }
+        // ReSharper restore MemberCanBePrivate.Global
 
         public TransparencyMap(int bitDepth)
         {

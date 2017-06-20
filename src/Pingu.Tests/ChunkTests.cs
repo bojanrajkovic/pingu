@@ -63,14 +63,12 @@ namespace Pingu.Tests
         [InlineData(ColorType.Grayscale)]
         [InlineData(ColorType.GrayscaleAlpha)]
         [InlineData(ColorType.Indexed)]
-        public void Idat_throws_for_unsupported_color_type(ColorType colorType)
-        {
-            var arex = Assert.Throws<ArgumentException>(() => new IdatChunk (
+        public void Idat_throws_for_unsupported_color_type(ColorType colorType) =>
+            Assert.Throws<ArgumentException>(() => new IdatChunk (
                 new IhdrChunk (1, 1, 8, colorType),
                 Array.Empty<byte>(),
                 FilterType.Dynamic
             ));
-        }
 
         [Fact]
         public void Ihdr_throws_for_garbage_color_type()
@@ -120,7 +118,7 @@ namespace Pingu.Tests
                     colorType
                 ));
             } else {
-                var chunk = new IhdrChunk (1, 1, bitDepth, colorType);
+                new IhdrChunk (1, 1, bitDepth, colorType);
             }
         }
     }

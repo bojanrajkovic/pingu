@@ -7,7 +7,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace Pingu.Benchmarks
 {

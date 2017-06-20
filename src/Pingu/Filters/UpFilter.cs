@@ -5,12 +5,12 @@ namespace Pingu.Filters
 {
     class UpFilter : IFilter
     {
-        private static readonly Lazy<UpFilter> lazy
+        static readonly Lazy<UpFilter> Lazy
             = new Lazy<UpFilter>(() => new UpFilter());
 
-        public static UpFilter Instance => lazy.Value;
+        public static UpFilter Instance => Lazy.Value;
 
-        internal UpFilter() { }
+        UpFilter() { }
 
         public FilterType Type => FilterType.Up;
 
@@ -24,7 +24,7 @@ namespace Pingu.Filters
             fixed (byte* previous = previousScanline)
             fixed (byte* targetUnoffset = targetBuffer) {
                 byte* target = targetUnoffset + targetOffset, rawm = raw, prev = previous;
-                int i = 0;
+                var i = 0;
 
                 for (; rawScanline.Length - i > 8; i += 8) {
                     target[0] = (byte)(rawm[0] - prev[0]);
@@ -53,24 +53,28 @@ namespace Pingu.Filters
         {
             int vecSize = Vector<byte>.Count, length = rawScanline.Length;
 
+            // ReSharper disable once PossibleLossOfFraction
+            // ReSharper disable once RedundantCast
+            // Do *not* remove the redundant float cast! This is done this way
+            // to make the generated assembly faster. :)
             var chunks = (int)((float)(length / vecSize));
 
             fixed (byte* rawPtr = rawScanline)
             fixed (byte* prevPtr = previousScanline)
             fixed (byte* targetPtr = targetBuffer) {
-                for (int i = 0; i < chunks; i++) {
-                    int src = i * vecSize;
+                for (var i = 0; i < chunks; i++) {
+                    var src = i * vecSize;
                     var vec = (new Vector<byte>(rawScanline, src) - new Vector<byte>(previousScanline, src));
                     vec.CopyTo(targetBuffer, src + targetOffset);
                 }
 
-                int start = vecSize * chunks + targetOffset;
-                for (int i = start; i < length; i++)
+                var start = vecSize * chunks + targetOffset;
+                for (var i = start; i < length; i++)
                     targetPtr[i] = unchecked((byte)(rawPtr[i] - prevPtr[i]));
             }
         }
 
-        public unsafe void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
+        public void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
         {
             // The Up filter reads the previous scanline, so if it's null, this must be the first
             // scanline and it's unfiltered.

@@ -6,7 +6,7 @@ namespace Pingu.Filters
 {
     class DynamicFilter : IFilter
     {
-        static readonly IFilter[] PossibleFilters = new IFilter[] {
+        static readonly IFilter[] PossibleFilters = {
             NullFilter.Instance,
             SubFilter.Instance,
             UpFilter.Instance,
@@ -14,12 +14,12 @@ namespace Pingu.Filters
             PaethFilter.Instance
         };
 
-        private static readonly Lazy<DynamicFilter> lazy
+        static readonly Lazy<DynamicFilter> Lazy
             = new Lazy<DynamicFilter>(() => new DynamicFilter());
 
-        public static DynamicFilter Instance => lazy.Value;
+        public static DynamicFilter Instance => Lazy.Value;
 
-        internal DynamicFilter() { }
+        DynamicFilter() { }
 
         public FilterType Type => FilterType.Dynamic;
 
@@ -44,7 +44,7 @@ namespace Pingu.Filters
         public void FilterInto(byte[] targetBuffer, int targetOffset, byte[] rawScanline, byte[] previousScanline, int bytesPerPixel)
         {
             IFilter bestFilter = NullFilter.Instance;
-            int bestSum = int.MaxValue;
+            var bestSum = int.MaxValue;
 
             foreach (var filter in PossibleFilters) {
                 filter.FilterInto(targetBuffer, 1, rawScanline, previousScanline, bytesPerPixel);
